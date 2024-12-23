@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.cashiq"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.cashiq"
@@ -42,7 +42,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.gcm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
 }

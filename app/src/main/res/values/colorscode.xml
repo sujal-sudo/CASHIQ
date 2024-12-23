@@ -1,3 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary App Colors -->
+    <color name="yellow">#FFA500</color> <!-- Replace with your desired shade of yellow -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray">#808080</color> <!-- Optional, for subtle text or borders -->
+
+    <color name="purple">#6200EE</color> <!-- Button background -->
 </resources>

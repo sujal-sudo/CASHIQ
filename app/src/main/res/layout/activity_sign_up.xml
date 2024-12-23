@@ -1,10 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignUpActivity">
+    android:background="@android:color/white"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/signup_email"
+        android:layout_width="333dp"
+        android:layout_height="50dp"
+        android:background="@drawable/input_field_background"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="142dp" />
+
+    <TextView
+        android:id="@+id/signup_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        tools:layout_editor_absoluteX="164dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+
+    <EditText
+        android:id="@+id/signup_name"
+        android:layout_width="333dp"
+        android:layout_height="50dp"
+        android:background="@drawable/input_field_background"
+        android:hint="Name"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="72dp" />
+
+    <EditText
+        android:id="@+id/signup_password"
+        android:layout_width="328dp"
+        android:layout_height="53dp"
+        android:background="@drawable/input_field_background"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="31dp"
+        tools:layout_editor_absoluteY="217dp" />
+
+    <CheckBox
+        android:id="@+id/terms_checkbox"
+        android:layout_width="231dp"
+        android:layout_height="41dp"
+        android:text="By signing up, you agree to the Terms of Service and Privacy Policy"
+        android:textColor="#AFAFAF"
+        android:textSize="12sp"
+        tools:layout_editor_absoluteX="89dp"
+        tools:layout_editor_absoluteY="293dp" />
+
+    <Button
+        android:id="@+id/signup_button"
+        android:layout_width="323dp"
+        android:layout_height="63dp"
+        android:backgroundTint="#FFCC00"
+        android:padding="16dp"
+        android:text="Sign Up"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="20dp"
+        tools:layout_editor_absoluteY="334dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Or with"
+        android:textSize="14sp"
+        tools:layout_editor_absoluteX="157dp"
+        tools:layout_editor_absoluteY="413dp" />
+
+    <Button
+        android:id="@+id/google_signup_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/google_button_background"
+        android:drawableStart="@drawable/google"
+        android:padding="16dp"
+        android:text="Sign Up with Google"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="448dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Already have an account? Login"
+        android:textColor="#6200EE"
+        android:textSize="14sp"
+        tools:layout_editor_absoluteX="107dp"
+        tools:layout_editor_absoluteY="545dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

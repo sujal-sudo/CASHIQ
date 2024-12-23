@@ -1,9 +1,16 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.CashiQ" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources>
+    <style name="Theme.CashIQ" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryVariant">#946602</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/yellow</item>
+        <item name="colorSecondaryVariant">#946602</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">@color/yellow</item>
     </style>
 
-    <style name="Theme.CashiQ" parent="Base.Theme.CashiQ" />
+    <style name="Theme.CashIQ.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>
