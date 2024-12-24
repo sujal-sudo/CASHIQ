@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -27,6 +28,7 @@ import com.google.android.gms.gcm.Task
             val emailEditText: EditText = findViewById(R.id.signup_email)
             val nameEditText: EditText = findViewById(R.id.signup_name)
             val passwordEditText: EditText = findViewById(R.id.signup_password)
+            val loginTextview: TextView = findViewById(R.id.loginTextview)
 
 //
 //        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -48,6 +50,11 @@ import com.google.android.gms.gcm.Task
                 } else {
                     Toast.makeText(this, "Please agree to the terms", Toast.LENGTH_SHORT).show()
                 }
+            }
+            loginTextview.setOnClickListener {
+                // Redirect to Sign Up Activity
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
             }
 
 //        // Set click listener for the Google Sign Up button
