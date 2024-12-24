@@ -19,6 +19,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- ViewPager for slides -->
+
+    <!-- Page indicators -->
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="0dp"
@@ -27,10 +30,11 @@
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toTopOf="@id/indicatorsContainer"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/skipButton" />
+        app:layout_constraintTop_toBottomOf="@id/skipButton"
+        app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Page indicators -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/indicatorsContainer"
         android:layout_width="0dp"
