@@ -46,6 +46,7 @@ class OnboardingActivity: AppCompatActivity() {
 
         initViews()
         setupViewPager()
+        setupIndicators()
 
 
     }
