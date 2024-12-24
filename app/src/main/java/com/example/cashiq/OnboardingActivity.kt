@@ -49,6 +49,24 @@ class OnboardingActivity: AppCompatActivity() {
         setupIndicators()
 
 
+//Explicit Intent to Signup Page
+        signUpButton.setOnClickListener {
+            val intent = Intent(this@OnboardingActivity, SignUpActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+
+
+//Explicit Intent to Login Page
+        loginButton.setOnClickListener {
+            val intent = Intent(this@OnboardingActivity, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+
+
     }
 
     private fun initViews() {
@@ -104,17 +122,6 @@ class OnboardingActivity: AppCompatActivity() {
         }
     }
 
-    private fun setOnClickListeners() {
-        skipButton.setOnClickListener {
-            navigateToSignUp()
-        }
-
-
-        loginButton.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        }
-    }
 
     private fun navigateToSignUp() {
         startActivity(Intent(this, SignUpActivity::class.java))
@@ -158,3 +165,8 @@ class OnboardingActivity: AppCompatActivity() {
 
         override fun getItemCount() = slides.size
     }
+
+
+
+
+
