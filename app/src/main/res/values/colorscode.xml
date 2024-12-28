@@ -6,4 +6,12 @@
     <color name="gray">#808080</color> <!-- Optional, for subtle text or borders -->
 
     <color name="purple">#6200EE</color> <!-- Button background -->
+    <color name="background_cream">#FFFDF6</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="red_500">#F44336</color>
+    <color name="yellow_500">#FFC107</color>
+    <color name="yellow_200">#FFECB3</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
 </resources>
