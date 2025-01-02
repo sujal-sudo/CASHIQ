@@ -4,6 +4,11 @@ plugins {
 }
 
 android {
+
+    buildFeatures{
+        viewBinding=true
+    }
+
     namespace = "com.example.cashiq"
     compileSdk = 35
 
@@ -16,6 +21,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildTypes {
         release {
