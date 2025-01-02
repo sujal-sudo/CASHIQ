@@ -74,6 +74,7 @@ class OnboardingActivity: AppCompatActivity() {
         indicatorsLayout = findViewById(R.id.indicatorsLayout)
         signUpButton = findViewById(R.id.signUpButton)
         loginButton = findViewById(R.id.loginButton)
+
     }
 
     private fun setupViewPager() {
