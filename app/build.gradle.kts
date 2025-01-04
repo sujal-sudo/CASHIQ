@@ -16,9 +16,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildFeatures {
-        viewBinding = true
-    }
 
     buildTypes {
         release {
@@ -51,7 +48,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("androidx.viewpager2:viewpager2:1.0.0")
-    implementation ("com.google.android.gms:play-services-auth:20.7.0")
-
-
 }
