@@ -7,19 +7,11 @@
         android:icon="@drawable/baseline_home_24"
         android:title="Home"
         />
+
+
     <item android:title="Profile"
         android:id="@+id/NavProfile"
         android:icon="@drawable/baseline_person_24"
         />
 
-
-    <item android:title="Notifications"
-        android:id="@+id/navNoti"
-        android:icon="@drawable/baseline_notifications_24"
-        />
-
-    <item android:title="theme"
-        android:icon="@drawable/baseline_light_mode_24"
-        android:id="@+id/navlight"
-        />
 </menu>
