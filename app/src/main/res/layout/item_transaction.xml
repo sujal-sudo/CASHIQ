@@ -18,12 +18,12 @@
             android:id="@+id/transactionIcon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:padding="8dp"
             android:background="@drawable/circle_background"
+            android:padding="8dp"
             android:src="@drawable/shoppingcart"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/gray" />
+            app:tint="@color/yellow" />
 
         <TextView
             android:id="@+id/transactionTitle"
