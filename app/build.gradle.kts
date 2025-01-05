@@ -7,6 +7,11 @@ android {
     namespace = "com.example.cashiq"
     compileSdk = 35
 
+    // Add buildFeatures block to enable view binding
+    buildFeatures {
+        viewBinding = true    // This enables view binding for your project
+    }
+
     defaultConfig {
         applicationId = "com.example.cashiq"
         minSdk = 24
@@ -17,6 +22,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Rest of your configuration remains the same
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,7 +42,7 @@ android {
 }
 
 dependencies {
-
+    // Your existing dependencies remain unchanged
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -48,6 +54,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("androidx.viewpager2:viewpager2:1.0.0")
-    implementation ("com.google.android.gms:play-services-auth:20.7.0")
-
+    implementation ("com.google.android.gms:play-services-auth:20.2.0")
 }
