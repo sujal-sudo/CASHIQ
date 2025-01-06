@@ -18,7 +18,7 @@ To set up the CASHIQ project, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/CASHIQ.git
+   git clone https://github.com/sujal-sudo/CASHIQ.git
 
    Usage
 Launch the app on your device.
