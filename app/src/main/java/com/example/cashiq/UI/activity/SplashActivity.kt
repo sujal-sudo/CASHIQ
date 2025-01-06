@@ -1,5 +1,5 @@
 // SplashActivity.kt
-package com.example.cashiq
+package com.example.cashiq.UI.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.view.animation.AccelerateDecelerateInterpolator
+import com.example.cashiq.R
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

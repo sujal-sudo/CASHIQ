@@ -1,0 +1,21 @@
+<resources>
+    <!-- Primary App Colors -->
+    <color name="yellow">#FFA500</color> <!-- Replace with your desired shade of yellow -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="purple">#6200EE</color> <!-- Button background -->
+    <color name="red">#FD3C4A</color> <!-- Button background -->
+    <color name="green">#00A86B</color> <!-- Button background -->
+
+    <color name="orange">#FF9800</color>
+    <color name="orange_light">#FAE8CC</color>
+    <color name="gray">#757575</color>
+    <color name="gray_light">#E0E0E0</color>
+    <color name="gray_light_bg">#F5F5F5</color>
+
+    <color name="primaryColor">#6200EE</color>
+    <color name="primaryColorDark">#3700B3</color>
+    <color name="secondaryColor">#03DAC6</color>
+
+</resources>
