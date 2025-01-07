@@ -87,11 +87,12 @@
 
     <Button
         android:id="@+id/signup_button"
-        android:layout_width="367dp"
-        android:layout_height="62dp"
+        android:layout_width="353dp"
+        android:layout_height="54dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="13dp"
+        android:background="@drawable/google_button_background"
         android:backgroundTint="@color/yellow"
         android:text="Sign Up"
         android:textColor="@android:color/white"
