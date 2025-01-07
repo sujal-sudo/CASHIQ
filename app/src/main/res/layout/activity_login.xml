@@ -23,33 +23,32 @@
 
     <EditText
         android:id="@+id/editTextEmail"
-        android:layout_width="363dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_width="315dp"
+        android:layout_height="53dp"
+        android:layout_marginStart="37dp"
         android:layout_marginTop="36dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="59dp"
         android:background="@drawable/input_field_background"
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewLogin" />
 
     <EditText
         android:id="@+id/editTextPassword"
-        android:layout_width="363dp"
-        android:layout_height="wrap_content"
+        android:layout_width="322dp"
+        android:layout_height="53dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="44dp"
         android:layout_marginEnd="24dp"
         android:background="@drawable/input_field_background"
         android:hint="Password"
         android:inputType="textPassword"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.317"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextEmail" />
 
@@ -58,13 +57,14 @@
         android:layout_width="352dp"
         android:layout_height="57dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="49dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="13dp"
         android:background="@drawable/google_button_background"
         android:backgroundTint="@color/yellow"
         android:text="Login"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.552"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPassword" />
 
