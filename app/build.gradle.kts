@@ -13,6 +13,8 @@ android {
     namespace = "com.example.cashiq"
     compileSdk = 35
 
+
+
     defaultConfig {
         applicationId = "com.example.cashiq"
         minSdk = 24
