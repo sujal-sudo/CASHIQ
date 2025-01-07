@@ -1,5 +1,14 @@
 <resources>
-    <string name="app_name">CashiQ</string>
+    <string name="current_month">Current Month: %1$s</string>
+    <string name="app_name">CASHIQ</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+        <string-array name="expense_categories">
+            <item>Food</item>
+            <item>Shopping</item>
+            <item>Groceries</item>
+            <item>Other</item>
+        </string-array>
+
 </resources>
