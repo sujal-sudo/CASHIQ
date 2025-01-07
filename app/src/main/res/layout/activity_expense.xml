@@ -56,17 +56,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/subtitle_text" />
 
+
     <ImageButton
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="112dp"
         android:background="@android:color/transparent"
         android:src="@drawable/baseline_arrow_back_24"
+        app:layout_constraintEnd_toStartOf="@+id/title_text"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
-
 
     <androidx.cardview.widget.CardView
         android:layout_width="382dp"
@@ -79,8 +84,10 @@
         app:cardElevation="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.529"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/total_amount_text">
+        app:layout_constraintTop_toBottomOf="@+id/total_amount_text"
+        app:layout_constraintVertical_bias="1.0">
 
 
         <LinearLayout

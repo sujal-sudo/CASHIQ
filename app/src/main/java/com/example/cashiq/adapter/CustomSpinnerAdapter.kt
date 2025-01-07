@@ -1,4 +1,4 @@
-// CustomSpinnerAdapter.kt
+package com.example.cashiq.adapter// com.example.cashiq.adapter.CustomSpinnerAdapter.kt
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View

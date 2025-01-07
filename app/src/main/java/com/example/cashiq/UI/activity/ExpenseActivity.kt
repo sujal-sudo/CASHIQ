@@ -1,6 +1,6 @@
 package com.example.cashiq.UI.activity
 
-import CustomSpinnerAdapter
+import com.example.cashiq.adapter.CustomSpinnerAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -38,7 +38,7 @@ class ExpenseActivity : AppCompatActivity() {
         backButton = findViewById(R.id.back_button)
         totalAmountTextView = findViewById(R.id.total_amount_text) // Make sure this view exists in your layout
 
-        // Set up the Spinner with the CustomSpinnerAdapter
+        // Set up the Spinner with the com.example.cashiq.adapter.CustomSpinnerAdapter
         val categories = listOf(
             CategoryItem("Food", R.drawable.baseline_food_24),
             CategoryItem("Shopping", R.drawable.shoppingcart),
