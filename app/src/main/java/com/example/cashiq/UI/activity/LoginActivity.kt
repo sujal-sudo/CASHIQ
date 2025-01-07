@@ -8,10 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
 
 class LoginActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
+        val DashboardButton : Button= findViewById(R.id.toDash)
         val loginButton: Button = findViewById(R.id.buttonLogin)
         val signUpTextView: TextView = findViewById(R.id.textViewSignUp) // Reference to Sign Up TextView
 
@@ -24,5 +25,12 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
+
+        DashboardButton.setOnClickListener{
+            val  intent = Intent( this,DashboardActivity :: class.java)
+            startActivity(intent)
+        }
+
+
     }
 }
