@@ -48,6 +48,8 @@
         android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
         android:hint="NPR 0"
+        android:autoSizeTextType="uniform"
+        android:inputType="number"
         android:padding="8dp"
         android:textColor="@color/white"
         android:textSize="50sp"

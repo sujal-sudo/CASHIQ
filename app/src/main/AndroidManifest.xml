@@ -23,11 +23,12 @@
         <activity
             android:name=".UI.activity.DashboardActivity"
             android:exported="true" />
-        <activity android:name=".UI.activity.SignUpActivity" />
+        <activity android:name=".UI.activity.SignUpActivity"
+            android:exported="true"/>
         <activity
             android:name=".UI.activity.SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.CashIQ.NoActionBar">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +37,7 @@
         </activity>
         <activity
             android:name=".UI.activity.OnboardingActivity"
-            android:theme="@style/Theme.CashIQ.NoActionBar" />
+             />
         <activity
             android:name=".UI.activity.LoginActivity"
             android:exported="true" />
