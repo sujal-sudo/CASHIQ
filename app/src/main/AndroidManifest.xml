@@ -16,13 +16,13 @@
             android:exported="false" />
         <activity
             android:name=".UI.activity.ExpenseActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".UI.activity.IncomeActivity"
             android:exported="false" />
         <activity
             android:name=".UI.activity.DashboardActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity android:name=".UI.activity.SignUpActivity" />
         <activity
             android:name=".UI.activity.SplashActivity"
