@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cashiq.R
-import com.example.cashiq.UI.TransactionViewModel
 import com.example.cashiq.UI.fragment.ProfileFragment
 import com.example.cashiq.databinding.ActivityDashboardBinding
 
@@ -24,7 +23,7 @@ import kotlin.math.abs
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
-    private val viewModel: TransactionViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +32,6 @@ class DashboardActivity : AppCompatActivity() {
 
         setupUI()
         setupTransactionsList()
-        observeTransactions()
     }
 
     private fun setupUI() {
@@ -45,11 +43,6 @@ class DashboardActivity : AppCompatActivity() {
         binding.transactionsRecyclerView.adapter = TransactionsAdapter(emptyList())
     }
 
-    private fun observeTransactions() {
-        viewModel.transactions.observe(this) { transactions ->
-            (binding.transactionsRecyclerView.adapter as TransactionsAdapter).updateTransactions(transactions)
-        }
-    }
 
     private fun setupNavigation() {
         binding.bottomNav.apply {
