@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "289323126595",
+    "project_id": "cashiq-ee79f",
+    "storage_bucket": "cashiq-ee79f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289323126595:android:faae7dce3775f96a3b29f6",
+        "android_client_info": {
+          "package_name": "com.example.cashiq"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI3rUnbBu8piU_h5l2Pwo7HAzpM2Ub0iA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

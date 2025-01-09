@@ -1,16 +1,17 @@
   plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
-    namespace = "com.example.cashiq"
-    compileSdk = 35
 
     // Add buildFeatures block to enable view binding
     buildFeatures {
         viewBinding = true    // This enables view binding for your project
     }
+    namespace = "com.example.cashiq"
+    compileSdk = 35
 
 
 
@@ -50,6 +51,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.gcm)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
