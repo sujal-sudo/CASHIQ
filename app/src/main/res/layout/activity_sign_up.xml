@@ -65,6 +65,7 @@
         android:background="@drawable/input_field_background"
         android:hint="Password"
         android:inputType="textPassword"
+       
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
