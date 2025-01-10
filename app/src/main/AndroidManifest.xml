@@ -23,7 +23,7 @@
             android:exported="false" />
         <activity
             android:name=".UI.activity.DashboardActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity android:name=".UI.activity.SignUpActivity" />
         <activity
             android:name=".UI.activity.SplashActivity"
