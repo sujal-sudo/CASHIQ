@@ -12,15 +12,14 @@
         android:id="@+id/textViewLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="114dp"
+        android:layout_marginStart="142dp"
+        android:layout_marginTop="61dp"
+        android:layout_marginEnd="144dp"
         android:paddingBottom="24dp"
         android:text="Login"
         android:textSize="50sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -94,21 +93,11 @@
         android:clickable="true"
         android:focusable="true"
         android:text="Don’t have an account yet? Sign Up"
-        android:textStyle="italic"
         android:textColor="@color/yellow"
+        android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewForgotPassword" />
-
-    <Button
-        android:id="@+id/toDash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="Button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
