@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.CashIQ" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.CashIQ" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryVariant">#946602</item>
         <item name="colorOnPrimary">@color/white</item>

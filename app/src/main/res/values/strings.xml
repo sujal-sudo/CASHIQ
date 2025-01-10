@@ -1,6 +1,7 @@
 <resources>
     <string name="current_month">Current Month: %1$s</string>
-    <string name="app_name">CASHIQ</string>
+    <string name="app_name">CASHIQ
+    </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -10,5 +11,16 @@
             <item>Groceries</item>
             <item>Other</item>
         </string-array>
+
+    <string-array name="income_categories">
+        <item>Salary</item>
+        <item>Freelance</item>
+        <item>Business</item>
+        <item>Investment</item>
+        <item>Rental</item>
+        <item>Others</item>
+    </string-array>
+
+
 
 </resources>

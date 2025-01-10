@@ -1,10 +1,14 @@
-plugins {
+  plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
 }
 
 android {
+
+    buildFeatures{
+        viewBinding=true
+    }
 
     // Add buildFeatures block to enable view binding
     buildFeatures {
@@ -53,6 +57,7 @@ dependencies {
     implementation(libs.play.services.gcm)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

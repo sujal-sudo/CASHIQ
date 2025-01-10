@@ -13,6 +13,7 @@ playServicesGcm = "17.0.0"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.1.0"
 firebaseDatabase = "21.0.0"
+firebaseDatabaseKtx = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,6 +27,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 play-services-gcm = { group = "com.google.android.gms", name = "play-services-gcm", version.ref = "playServicesGcm" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
