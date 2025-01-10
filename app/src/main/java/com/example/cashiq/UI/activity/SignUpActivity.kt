@@ -32,7 +32,10 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up) // Ensure this layout exists
+        binding=ActivitySignUpBinding.inflate(layoutInflater)
+
+//        setContentView(R.layout.activity_sign_up) // Ensure this layout exists
+        setContentView(binding.root) // Ensure this layout exists
 
 
         //Firebase and Database
@@ -104,7 +107,7 @@ class SignUpActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) { // snapshot is the object that specifies a particular location of a data
                 if (!snapshot.exists()){
                     val id = databaseReference.push().key
-                    val userData = UserData(id,username, email, password)
+                    val userData = UserData(id,username, password, email)
                     databaseReference.child(id!!).setValue(userData)
                     Toast.makeText(this@SignUpActivity, "Signup Successful" , Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@SignUpActivity,LoginActivity::class.java))
