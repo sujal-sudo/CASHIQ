@@ -87,7 +87,7 @@ class DashboardActivity : AppCompatActivity() {
                     R.id.navHome -> true
                     R.id.NavProfile -> {
                         supportFragmentManager.beginTransaction()
-                            .replace(R.id.container, ProfileFragment())
+                            .replace(R.id.NavProfile, ProfileFragment())
                             .commit()
                         true
                     }
