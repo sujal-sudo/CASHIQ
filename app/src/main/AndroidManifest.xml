@@ -8,6 +8,7 @@
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
+
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CashIQ">
@@ -22,9 +23,8 @@
             android:exported="false" />
         <activity
             android:name=".UI.activity.DashboardActivity"
-            android:exported="true" />
-        <activity android:name=".UI.activity.SignUpActivity"
-            android:exported="true"/>
+            android:exported="false" />
+        <activity android:name=".UI.activity.SignUpActivity" />
         <activity
             android:name=".UI.activity.SplashActivity"
             android:exported="true"

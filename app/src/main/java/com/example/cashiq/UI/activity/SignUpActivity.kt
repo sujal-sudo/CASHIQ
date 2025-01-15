@@ -33,6 +33,10 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding=ActivitySignUpBinding.inflate(layoutInflater)
+
+//        setContentView(R.layout.activity_sign_up) // Ensure this layout exists
+        setContentView(binding.root) // Ensure this layout exists
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

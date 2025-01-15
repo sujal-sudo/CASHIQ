@@ -22,6 +22,7 @@
         android:layout_marginStart="144dp"
         android:layout_marginTop="8dp"
         android:text="Expense"
+        android:textStyle="bold"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,30 +35,28 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="104dp"
         android:text="How much?"
+        android:textStyle="bold"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_text" />
+
 
     <EditText
         android:id="@+id/total_amount_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="7dp"
         android:layout_marginEnd="16dp"
-        android:background="@android:color/transparent"
         android:hint="NPR 0"
-        android:autoSizeTextType="uniform"
-        android:inputType="number"
-        android:padding="8dp"
         android:textColor="@color/white"
+        android:padding="8dp"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/subtitle_text" />
-
 
     <ImageButton
         android:id="@+id/back_button"
@@ -119,7 +118,8 @@
                 android:id="@+id/category_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/yellow"
+                android:backgroundTint="@color/black"
+                android:layout_marginTop="15dp"
                 android:padding="8dp" />
 
             <EditText
@@ -129,6 +129,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edittext_style"
                 android:hint="Description"
+                android:layout_marginTop="25dp"
                 android:padding="12dp"
                 android:textSize="16sp" />
 
@@ -137,6 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Repeat transaction"
+                android:layout_marginTop="10dp"
                 android:textColor="@android:color/black" />
 
             <Switch
@@ -150,6 +152,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/custom_card_background"
+                android:layout_marginTop="15dp"
                 android:text="Continue"
                 android:textColor="@android:color/white" />
 
