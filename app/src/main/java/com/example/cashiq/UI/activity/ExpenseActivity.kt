@@ -26,11 +26,13 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var totalAmountTextView: TextView
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense) // Update with your actual layout name
 
         // Initialize views
+
         categorySpinner = findViewById(R.id.category_spinner)
         descriptionEditText = findViewById(R.id.description)
         repeatSwitch = findViewById(R.id.repeat_transaction)
@@ -73,6 +75,8 @@ class ExpenseActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun animateButton(view: View) {
         val scaleAnimation = ScaleAnimation(
             1f, 0.9f, 1f, 0.9f, // Start and end scale
@@ -90,4 +94,5 @@ class ExpenseActivity : AppCompatActivity() {
         val amount = amountStr.toDoubleOrNull() ?: 0.0
         totalAmountTextView.text = "Total Amount: $amount"
     }
+
 }
