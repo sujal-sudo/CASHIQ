@@ -1,4 +1,7 @@
 package com.example.cashiq.model
 
-class Categories {
-}
+data class Categories(
+    var categoryId: String = "",
+    var categoryName: String ="",
+    var categoryItem: String =""
+)
