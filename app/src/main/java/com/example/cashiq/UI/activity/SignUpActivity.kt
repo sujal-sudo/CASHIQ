@@ -37,8 +37,6 @@ class SignUpActivity : AppCompatActivity() {
 
 //        setContentView(R.layout.activity_sign_up) // Ensure this layout exists
         setContentView(binding.root) // Ensure this layout exists
-        binding = ActivitySignUpBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
 
         //Firebase and Database
