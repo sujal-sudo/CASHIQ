@@ -32,7 +32,7 @@ class SplashActivity : AppCompatActivity() {
 
         // Navigate to onboarding after animation
         logoText.postDelayed({
-            startActivity(Intent(this, OnbordingActivity::class.java))
+            startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
         }, 1000)
     }
