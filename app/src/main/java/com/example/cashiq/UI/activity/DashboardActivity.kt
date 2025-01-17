@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -14,6 +15,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cashiq.R
 import com.example.cashiq.UI.fragment.ProfileFragment
 import com.example.cashiq.databinding.ActivityDashboardBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -22,21 +29,61 @@ import kotlin.math.abs
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
+    private lateinit var firebaseDatabase: FirebaseDatabase
+    private lateinit var databaseReference: DatabaseReference
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupUI()
-//        setupTransactionsList()
-        setupNavigation()
-        setupClickListeners()
+        // Firebase Initialization
+        auth = FirebaseAuth.getInstance()
+        firebaseDatabase = FirebaseDatabase.getInstance()
+        databaseReference = firebaseDatabase.reference.child("users")
+
+        // UI Initialization
         updateCurrentMonth()
+        setupClickListeners()
+
+        // Fetch user data
+        fetchUserData()
     }
 
-    private fun setupUI() {
-        // ... existing setup code ...
+    private fun fetchUserData() {
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userRef = databaseReference.child(userId)
+
+            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // Map snapshot to UserData object
+                    val userData = snapshot.getValue(UserData::class.java)
+
+                    if (userData != null) {
+                        val income = snapshot.child("income").getValue(Double::class.java) ?: 0.0
+                        val expenses = snapshot.child("expenses").getValue(Double::class.java) ?: 0.0
+
+                        // Update UI
+                        binding.incomeText.text = "Income: $${String.format("%.2f", income)}"
+                        binding.expensesText.text = "Expenses: $${String.format("%.2f", expenses)}"
+                    } else {
+                        Toast.makeText(this@DashboardActivity, "User data not found.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@DashboardActivity, "Error fetching user data: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        } else {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
     }
 
     private fun updateCurrentMonth() {
@@ -53,50 +100,5 @@ class DashboardActivity : AppCompatActivity() {
         binding.expensesCard.setOnClickListener {
             startActivity(Intent(this, ExpenseActivity::class.java))
         }
-
-        // Setup time filter clicks
-        binding.apply {
-            val filters = listOf(todayFilter, weekFilter, monthFilter, yearFilter)
-
-            filters.forEach { filter ->
-                filter.setOnClickListener {
-                    // Reset all filters to default state
-                    filters.forEach { it.setBackgroundResource(0) }
-                    filters.forEach { it.setTextColor(ContextCompat.getColor(this@DashboardActivity, R.color.gray)) }
-
-                    // Highlight selected filter
-                    filter.setBackgroundResource(R.drawable.time_filter_selected_bg)
-                    filter.setTextColor(ContextCompat.getColor(this@DashboardActivity, R.color.orange))
-
-                    // Update transactions based on selected filter
-//                    updateTransactions(filter.id)
-                }
-            }
-        }
     }
-
-//    private fun setupTransactionsList() {
-//        binding.transactionsRecyclerView.layoutManager = LinearLayoutManager(this)
-//        binding.transactionsRecyclerView.adapter = TransactionsAdapter(emptyList())
-//    }
-
-    private fun setupNavigation() {
-        binding.bottomNav.apply {
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.navHome -> true
-                    R.id.NavProfile -> {
-                        supportFragmentManager.beginTransaction()
-                            .replace(R.id.container, ProfileFragment())
-                            .commit()
-                        true
-                    }
-                    else -> false
-                }
-            }
-            selectedItemId = R.id.navHome
-        }
-    }
-
-    // ... rest of the existing code ...
 }
