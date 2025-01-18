@@ -1,60 +1,112 @@
 package com.example.cashiq.UI.fragment
 
+import android.app.AlertDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.cashiq.R
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import com.example.cashiq.databinding.FragmentProfileBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
+
+    private var loggedInUsername: String = "CurrentUsername"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+    ): View {
+        // Inflate the layout for this fragment using View Binding
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Set the initial username
+        binding.tvUsername.text = loggedInUsername
+
+        // Set up click listeners
+        setupClickListeners()
+
+        // Edit username click listener
+        binding.ivEditUsername.setOnClickListener {
+            showEditUsernameDialog()
+        }
+    }
+
+    private fun showEditUsernameDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Edit Username")
+
+        // Set up the input
+        val input = EditText(requireContext()).apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            setText(binding.tvUsername.text)
+        }
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("OK") { dialog, _ ->
+            val newUsername = input.text.toString().trim()
+            if (newUsername.isNotEmpty()) {
+                loggedInUsername = newUsername // Update the stored username
+                binding.tvUsername.text = newUsername // Update the TextView
             }
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun setupClickListeners() {
+        binding.apply {
+            // Account section click listener
+            layoutAccount.setOnClickListener {
+                // Navigate to account section
+            }
+
+            // Settings section click listener
+            layoutSettings.setOnClickListener {
+                // Navigate to settings section
+            }
+
+            // Export data click listener
+            layoutExportData.setOnClickListener {
+                // Handle data export
+            }
+
+            // Logout section click listener
+            layoutLogout.setOnClickListener {
+                showLogoutConfirmationDialog()
+            }
+        }
+    }
+
+    private fun showLogoutConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout?")
+            .setPositiveButton("Yes") { _, _ ->
+                // Perform logout
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null // Clean up binding reference
     }
 }

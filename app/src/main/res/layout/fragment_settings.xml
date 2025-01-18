@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_currency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Currency"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_language"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Language"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Theme"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_security"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Security"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Notification"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_about"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="About"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Help"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="18sp" />
+
+</LinearLayout>

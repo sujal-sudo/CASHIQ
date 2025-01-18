@@ -56,7 +56,6 @@ class IncomeActivity : AppCompatActivity() {
             CategoryItem("Rental", R.drawable.rental),
             CategoryItem("Others", R.drawable.others)
         )
-
         val adapter = CustomSpinnerAdapter(this, categories)
         categorySpinner.adapter = adapter
 
