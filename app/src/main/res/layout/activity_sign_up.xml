@@ -18,6 +18,7 @@
         android:layout_marginEnd="28dp"
         android:background="@drawable/input_field_background"
         android:hint="Email"
+        android:selectAllOnFocus="true"
         android:inputType="textEmailAddress"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,6 +51,7 @@
         android:layout_marginEnd="28dp"
         android:background="@drawable/input_field_background"
         android:hint="Name"
+        android:selectAllOnFocus="true"
         android:inputType="textEmailAddress"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,12 +60,14 @@
 
     <EditText
         android:id="@+id/signup_password"
+
         android:layout_width="330dp"
         android:layout_height="53dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="21dp"
         android:layout_marginEnd="28dp"
         android:background="@drawable/input_field_background"
+        android:selectAllOnFocus="true"
         android:hint="Password"
         android:inputType="textPassword"
        
