@@ -6,4 +6,5 @@ data class UserData(
     val username: String? = null,
     val email: String? =null,
     val password: String? = null,
+    val transactionIds: List<String>? = null // List to hold transaction IDs
 )
