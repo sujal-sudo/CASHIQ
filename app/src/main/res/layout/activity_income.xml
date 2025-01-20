@@ -53,7 +53,6 @@
         android:layout_marginEnd="16dp"
         android:hint="NPR 0"
         android:selectAllOnFocus="true"
-        android:inputType="number"
         android:padding="8dp"
         android:inputType="number"
         android:textColor="@color/white"
