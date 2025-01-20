@@ -2,9 +2,12 @@ package com.example.cashiq.UI.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.replace
 import com.example.cashiq.R
+import com.example.cashiq.UI.fragment.BudgetFragment
 import com.example.cashiq.UI.fragment.DashFragment
 import com.example.cashiq.UI.fragment.ProfileFragment
+import com.example.cashiq.UI.fragment.TransactionFragment
 import com.example.cashiq.databinding.ActivityDashboardBinding
 
 class DashboardActivity : AppCompatActivity() {
@@ -44,6 +47,23 @@ class DashboardActivity : AppCompatActivity() {
                             .commit()
                         true
                     }
+                    R.id.NavTransaction ->{
+                        // Navigate To Transaction
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.dashframe,TransactionFragment())
+                            .commit()
+                        true
+                    }
+
+                    R.id.NavBudget ->{
+                        // Navigate To Transaction
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.dashframe,BudgetFragment())
+                            .commit()
+                        true
+                    }
+
+
                     else -> false
                 }
             }
