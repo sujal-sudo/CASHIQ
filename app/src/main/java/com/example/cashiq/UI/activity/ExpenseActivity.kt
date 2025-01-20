@@ -28,17 +28,18 @@ class ExpenseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_expense) // Update with your actual layout name
+        setContentView(R.layout.activity_expense) // Ensure this matches the XML layout file name
 
         // Initialize views
+        amountEditText = findViewById(R.id.total_amount_text) // Correct ID from XML
         categorySpinner = findViewById(R.id.category_spinner)
         descriptionEditText = findViewById(R.id.description)
         repeatSwitch = findViewById(R.id.repeat_transaction)
         continueButton = findViewById(R.id.continue_button)
         backButton = findViewById(R.id.back_button)
-        totalAmountTextView = findViewById(R.id.total_amount_text) // Make sure this view exists in your layout
+        totalAmountTextView = findViewById(R.id.total_amount_text) // This might not be needed if using a different view
 
-        // Set up the Spinner with the com.example.cashiq.adapter.CustomSpinnerAdapter
+        // Set up the Spinner with the CustomSpinnerAdapter
         val categories = listOf(
             CategoryItem("Food", R.drawable.baseline_food_24),
             CategoryItem("Shopping", R.drawable.shoppingcart),
@@ -59,35 +60,40 @@ class ExpenseActivity : AppCompatActivity() {
 
         // Set up the back button
         backButton.setOnClickListener {
-            // Create an intent to navigate to DashboardActivity
-            val intent = Intent(this, DashboardActivity::class.java)
-            startActivity(intent) // Start DashboardActivity
-            finish() // Optionally finish the current activity if you don't want to return to it
+            finish() // Close the current activity
         }
 
         // Set up the button click listener
         continueButton.setOnClickListener {
             animateButton(it)
-            calculateTotalAmount()
-            // Handle the continue action here (e.g., save data, navigate)
+            handleContinueAction()
         }
     }
 
     private fun animateButton(view: View) {
         val scaleAnimation = ScaleAnimation(
-            1f, 0.9f, 1f, 0.9f, // Start and end scale
-            ScaleAnimation.RELATIVE_TO_SELF, 0.5f, // Pivot X
-            ScaleAnimation.RELATIVE_TO_SELF, 0.5f // Pivot Y
+            1f, 0.9f, 1f, 0.9f,
+            ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
+            ScaleAnimation.RELATIVE_TO_SELF, 0.5f
         )
-        scaleAnimation.duration = 100 // Animation duration in milliseconds
+        scaleAnimation.duration = 100
         scaleAnimation.repeatCount = 1
         scaleAnimation.repeatMode = ScaleAnimation.REVERSE
         view.startAnimation(scaleAnimation)
     }
 
-    private fun calculateTotalAmount() {
-        val amountStr = amountEditText.text.toString()
-        val amount = amountStr.toDoubleOrNull() ?: 0.0
-        totalAmountTextView.text = "Total Amount: $amount"
+    private fun handleContinueAction() {
+        val amount = amountEditText.text.toString().toDoubleOrNull() ?: 0.0
+
+        if (amount <= 0) {
+            totalAmountTextView.text = "Please enter a valid amount"
+            return
+        }
+
+        // Return the amount to the DashboardActivity
+        val resultIntent = Intent()
+        resultIntent.putExtra("EXPENSE_AMOUNT", amount)
+        setResult(RESULT_OK, resultIntent)
+        finish()  // Close the ExpenseActivity
     }
 }

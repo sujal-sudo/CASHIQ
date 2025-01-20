@@ -7,6 +7,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
+import com.example.cashiq.databinding.ActivityLoginBinding
 import com.example.cashiq.databinding.ActivitySignUpBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -107,7 +108,7 @@ class SignUpActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) { // snapshot is the object that specifies a particular location of a data
                 if (!snapshot.exists()){
                     val id = databaseReference.push().key
-                    val userData = UserData(id,username, password, email)
+                    val userData = UserData(id,username, email, password)
                     databaseReference.child(id!!).setValue(userData)
                     Toast.makeText(this@SignUpActivity, "Signup Successful" , Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@SignUpActivity,LoginActivity::class.java))
