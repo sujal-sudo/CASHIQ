@@ -8,10 +8,12 @@
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
-
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CashIQ">
+        <activity
+            android:name=".UI.activity.ForgetPasswordActivity"
+            android:exported="false" />
         <activity
             android:name=".UI.activity.NotificationActivity"
             android:exported="false" />
