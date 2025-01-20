@@ -6,9 +6,6 @@
 
 android {
 
-    buildFeatures{
-        viewBinding=true
-    }
 
     // Add buildFeatures block to enable view binding
     buildFeatures {

@@ -55,6 +55,7 @@
         android:selectAllOnFocus="true"
         android:inputType="number"
         android:padding="8dp"
+        android:inputType="number"
         android:textColor="@color/white"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"

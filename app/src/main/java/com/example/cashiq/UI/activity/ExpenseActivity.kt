@@ -26,6 +26,7 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var totalAmountTextView: TextView
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense) // Ensure this matches the XML layout file name
