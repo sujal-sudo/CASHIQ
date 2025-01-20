@@ -46,6 +46,19 @@ class DashboardActivity : AppCompatActivity() {
                             .commit()
                         true
                     }
+                    R.id.NavBudget -> {
+                        // Navigate to ProfileFragment
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.dashframe, BudgetFragment())
+                            .commit()
+                        true
+                    }R.id.NavTransaction -> {
+                    // Navigate to ProfileFragment
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.dashframe, TransactionFragment())
+                        .commit()
+                    true
+                }
                     else -> false
                 }
             }
