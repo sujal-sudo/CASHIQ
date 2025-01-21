@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
 import com.example.cashiq.UI.CategoryItem
@@ -85,6 +86,19 @@ class ExpenseActivity : AppCompatActivity() {
 
     private fun handleContinueAction() {
         val amount = amountEditText.text.toString().toDoubleOrNull() ?: 0.0
+        val description = descriptionEditText.text.toString()
+        val isRecurring = repeatSwitch.isChecked
+        val category = (categorySpinner.selectedItem as? CategoryItem)?.name ?: ""
+
+        if (amount == null || amount <= 0) {
+            Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (description.isEmpty()) {
+            Toast.makeText(this, "Please enter a description", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         if (amount <= 0) {
             totalAmountTextView.text = "Please enter a valid amount"

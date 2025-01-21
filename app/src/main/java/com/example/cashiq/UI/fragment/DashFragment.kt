@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.cashiq.R
 import com.example.cashiq.UI.activity.ExpenseActivity
@@ -15,48 +17,55 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
 class DashFragment : Fragment() {
 
-    private var _binding: FragmentDashBinding? = null // Backing property for binding
-    private val binding get() = _binding!! // Non-null property for binding
+    private var _binding: FragmentDashBinding? = null
+    private val binding get() = _binding!!
+    private var totalBalance: Double = 0.0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    // Register activity result launchers
+    private val incomeLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            val amount = result.data?.getDoubleExtra("INCOME_AMOUNT", 0.0) ?: 0.0
+            updateBalance(amount)
+        }
     }
 
+    private val expenseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            val amount = result.data?.getDoubleExtra("EXPENSE_AMOUNT", 0.0) ?: 0.0
+            updateBalance(-amount)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout using View Binding
+    ): View {
         _binding = FragmentDashBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Call your setup methods
+        setupUI()
+        setOnClickListeners()
         updateCurrentMonth()
-        setupClickListeners()
     }
 
-
-    private fun updateCurrentMonth() {
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        val currentMonth = dateFormat.format(Date())
-        binding.monthText.text = currentMonth
+    private fun setupUI() {
+        binding.balanceAmount.text = "NPR ${String.format("%.2f", totalBalance)}"
     }
 
-    private fun setupClickListeners() {
+    private fun setOnClickListeners() {
         binding.incomeCard.setOnClickListener {
-            startActivity(Intent(requireContext(), IncomeActivity::class.java))
+            val intent = Intent(requireContext(), IncomeActivity::class.java)
+            incomeLauncher.launch(intent)
         }
 
         binding.expensesCard.setOnClickListener {
-            startActivity(Intent(requireContext(), ExpenseActivity::class.java))
+            val intent = Intent(requireContext(), ExpenseActivity::class.java)
+            expenseLauncher.launch(intent)
         }
 
         binding.apply {
@@ -79,8 +88,24 @@ class DashFragment : Fragment() {
         }
     }
 
+    private fun updateBalance(amount: Double) {
+        totalBalance += amount
+        binding.balanceAmount.text = "NPR ${String.format("%.2f", totalBalance)}"
+    }
+
+    private fun updateCurrentMonth() {
+        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+        val currentMonth = dateFormat.format(Date())
+        binding.monthText.text = currentMonth
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null // Avoid memory leaks
+    }
+
+    companion object {
+        const val INCOME_REQUEST_CODE = 1001
+        const val EXPENSE_REQUEST_CODE = 1002
     }
 }
