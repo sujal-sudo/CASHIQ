@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 class DashFragment : Fragment() {
 
     private var _binding: FragmentDashBinding? = null // Backing property for binding
@@ -23,6 +24,7 @@ class DashFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +42,7 @@ class DashFragment : Fragment() {
         updateCurrentMonth()
         setupClickListeners()
     }
+
 
     private fun updateCurrentMonth() {
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
