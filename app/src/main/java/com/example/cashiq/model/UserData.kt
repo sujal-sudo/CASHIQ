@@ -1,4 +1,4 @@
-package com.example.cashiq.UI.activity
+package com.example.cashiq.model
 
 data class UserData(
     // storing 3 data in realtime database

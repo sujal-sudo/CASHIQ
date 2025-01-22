@@ -7,8 +7,8 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
-import com.example.cashiq.databinding.ActivityLoginBinding
 import com.example.cashiq.databinding.ActivitySignUpBinding
+import com.example.cashiq.model.UserData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
