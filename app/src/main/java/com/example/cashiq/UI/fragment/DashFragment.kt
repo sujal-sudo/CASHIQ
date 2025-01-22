@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -51,6 +52,7 @@ class DashFragment : Fragment() {
         setupUI()
         setOnClickListeners()
         updateCurrentMonth()
+//        loadRecyclerViewLoaderIntoScrollView()
     }
 
     private fun setupUI() {
@@ -98,6 +100,20 @@ class DashFragment : Fragment() {
         val currentMonth = dateFormat.format(Date())
         binding.monthText.text = currentMonth
     }
+
+//    private fun loadRecyclerViewLoaderIntoScrollView() {
+//        // Get the LinearLayout inside the HorizontalScrollView
+//        val transactionContainer = binding.TransactionScroolViewDash.getChildAt(0) as LinearLayout
+//        transactionContainer.removeAllViews() // Clear any existing views if necessary
+//
+//        // Inflate the recycler_view_loader_dashfrag layout
+//        val inflater = LayoutInflater.from(requireContext())
+//        val recyclerViewLoaderView = inflater.inflate(R.layout.recycler_view_loader_dashfrag, transactionContainer, false)
+//
+//        // Add the inflated view to the container
+//        transactionContainer.addView(recyclerViewLoaderView)
+//    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
