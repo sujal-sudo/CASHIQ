@@ -66,8 +66,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="382dp"
         android:layout_height="421dp"
-        android:layout_marginStart="7dp"
-        android:layout_marginEnd="7dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="15dp"
         app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="16dp"
@@ -103,18 +103,18 @@
                 android:id="@+id/category_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/black"
                 android:layout_marginTop="15dp"
+                android:backgroundTint="@color/black"
                 android:padding="8dp" />
 
             <EditText
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edittext_style"
                 android:hint="Description"
-                android:layout_marginTop="25dp"
                 android:padding="12dp"
                 android:textSize="16sp" />
 
@@ -122,8 +122,8 @@
                 android:id="@+id/repeat_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Repeat transaction"
                 android:layout_marginTop="10dp"
+                android:text="Repeat transaction"
                 android:textColor="@android:color/black" />
 
             <Switch
@@ -136,8 +136,8 @@
                 android:id="@+id/continue_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/custom_card_background"
                 android:layout_marginTop="15dp"
+                android:background="@drawable/custom_card_background"
                 android:text="Continue"
                 android:textColor="@android:color/white" />
 

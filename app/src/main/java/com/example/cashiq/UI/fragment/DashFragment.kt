@@ -6,14 +6,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.cashiq.R
 import com.example.cashiq.UI.activity.ExpenseActivity
 import com.example.cashiq.UI.activity.IncomeActivity
 import com.example.cashiq.databinding.FragmentDashBinding
+import com.google.android.material.tabs.TabLayoutMediator
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,19 +24,21 @@ class DashFragment : Fragment() {
     private var totalBalance: Double = 0.0
 
     // Register activity result launchers
-    private val incomeLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            val amount = result.data?.getDoubleExtra("INCOME_AMOUNT", 0.0) ?: 0.0
-            updateBalance(amount)
+    private val incomeLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val amount = result.data?.getDoubleExtra("INCOME_AMOUNT", 0.0) ?: 0.0
+                updateBalance(amount)
+            }
         }
-    }
 
-    private val expenseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            val amount = result.data?.getDoubleExtra("EXPENSE_AMOUNT", 0.0) ?: 0.0
-            updateBalance(-amount)
+    private val expenseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val amount = result.data?.getDoubleExtra("EXPENSE_AMOUNT", 0.0) ?: 0.0
+                updateBalance(-amount)
+            }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,10 +50,11 @@ class DashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupUI()
         setOnClickListeners()
         updateCurrentMonth()
-//        loadRecyclerViewLoaderIntoScrollView()
+        setupViewPagerWithTabs()
     }
 
     private fun setupUI() {
@@ -69,25 +71,6 @@ class DashFragment : Fragment() {
             val intent = Intent(requireContext(), ExpenseActivity::class.java)
             expenseLauncher.launch(intent)
         }
-
-        binding.apply {
-            val filters = listOf(todayFilter, weekFilter, monthFilter, yearFilter)
-
-            filters.forEach { filter ->
-                filter.setOnClickListener {
-                    // Reset all filters to default state
-                    filters.forEach { it.setBackgroundResource(0) }
-                    filters.forEach { it.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray)) }
-
-                    // Highlight selected filter
-                    filter.setBackgroundResource(R.drawable.time_filter_selected_bg)
-                    filter.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
-
-                    // Update transactions based on selected filter
-                    // updateTransactions(filter.id)
-                }
-            }
-        }
     }
 
     private fun updateBalance(amount: Double) {
@@ -101,19 +84,22 @@ class DashFragment : Fragment() {
         binding.monthText.text = currentMonth
     }
 
-//    private fun loadRecyclerViewLoaderIntoScrollView() {
-//        // Get the LinearLayout inside the HorizontalScrollView
-//        val transactionContainer = binding.TransactionScroolViewDash.getChildAt(0) as LinearLayout
-//        transactionContainer.removeAllViews() // Clear any existing views if necessary
-//
-//        // Inflate the recycler_view_loader_dashfrag layout
-//        val inflater = LayoutInflater.from(requireContext())
-//        val recyclerViewLoaderView = inflater.inflate(R.layout.recycler_view_loader_dashfrag, transactionContainer, false)
-//
-//        // Add the inflated view to the container
-//        transactionContainer.addView(recyclerViewLoaderView)
-//    }
+    private fun setupViewPagerWithTabs() {
+        // Set up the adapter for ViewPager2
+        val adapter = DashPagerAdapter(this)
+        binding.pagerDash.adapter = adapter
 
+        // Connect TabLayout with ViewPager2
+        TabLayoutMediator(binding.tabLayout, binding.pagerDash) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Today"
+                1 -> "Week"
+                2 -> "Month"
+                3 -> "Year"
+                else -> null
+            }
+        }.attach()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
