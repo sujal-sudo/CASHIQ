@@ -37,7 +37,7 @@ class ProfileFragment : Fragment() {
         // Set the initial username
         binding.tvUsername.text = loggedInUsername
 
-
+ 
         // Set up click listeners
         setupClickListeners()
 
