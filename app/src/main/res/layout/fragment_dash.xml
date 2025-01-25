@@ -34,15 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balanceLabel" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/transactionsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintTop_toBottomOf="@id/transactionHeader"
-        tools:layout_editor_absoluteX="16dp" />
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/timeFilterContainer"
         android:layout_width="match_parent"
@@ -54,66 +45,20 @@
         app:layout_constraintTop_toBottomOf="@id/buttonsLayout"
         app:strokeColor="@color/gray_light"
         app:strokeWidth="1dp"
-        tools:layout_editor_absoluteX="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <TextView
-                android:id="@+id/todayFilter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/time_filter_selected_bg"
-                android:gravity="center"
-                android:paddingVertical="8dp"
-                android:text="Today"
-                android:textColor="@color/orange" />
-
-            <TextView
-                android:id="@+id/weekFilter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingVertical="8dp"
-                android:text="Week"
-                android:textColor="@color/gray" />
-
-            <TextView
-                android:id="@+id/monthFilter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingVertical="8dp"
-                android:text="Month"
-                android:textColor="@color/gray" />
-
-            <TextView
-                android:id="@+id/yearFilter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingVertical="8dp"
-                android:text="Year"
-                android:textColor="@color/gray" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+        tools:layout_editor_absoluteX="16dp"/>
 
     <LinearLayout
         android:id="@+id/transactionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="27dp"
+        android:layout_marginEnd="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/timeFilterContainer"
-        tools:layout_editor_absoluteX="16dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout">
 
         <TextView
             android:layout_width="0dp"
@@ -240,6 +185,52 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/yellow" />
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="373dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonsLayout">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Week" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Month" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Year" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager_dash"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/transactionHeader" />
+
+
     <!-- Balance Section -->
 
     <!-- Income/Expense Buttons -->
@@ -247,16 +238,6 @@
     <!-- Time Filter -->
 
     <!-- Recent Transactions -->
-
-    <!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
-    <!--        android:id="@+id/bottomNav"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:background="@color/white"-->
-    <!--        app:itemIconTint="@color/bottom_nav_colors"-->
-    <!--        app:labelVisibilityMode="unlabeled"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:menu="@menu/navbar" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

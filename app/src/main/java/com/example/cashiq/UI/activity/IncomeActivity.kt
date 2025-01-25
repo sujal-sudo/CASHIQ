@@ -1,21 +1,19 @@
 package com.example.cashiq.UI.activity
 
-import com.example.cashiq.adapter.CustomSpinnerAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.animation.ScaleAnimation
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.Spinner
-import android.widget.Switch
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
 import com.example.cashiq.UI.CategoryItem
+import com.example.cashiq.adapter.CustomSpinnerAdapter
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 class IncomeActivity : AppCompatActivity() {
 
@@ -34,6 +32,7 @@ class IncomeActivity : AppCompatActivity() {
         initializeViews()
         setupSpinner()
         setupClickListeners()
+        setupCurrencyFormatting()
     }
 
     private fun initializeViews() {
@@ -59,9 +58,7 @@ class IncomeActivity : AppCompatActivity() {
         categorySpinner.adapter = adapter
 
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                // Handle category selection if needed
-            }
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {}
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -69,30 +66,41 @@ class IncomeActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         backButton.setOnClickListener {
-            finish()  // Close the activity
+            finish()
         }
 
         continueButton.setOnClickListener {
             animateButton(it)
             handleContinueAction()
         }
+    }
 
-        amountEditText.addTextChangedListener(object : android.text.TextWatcher {
+    private fun setupCurrencyFormatting() {
+        amountEditText.addTextChangedListener(object : TextWatcher {
+            private var currentText = ""
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-            override fun afterTextChanged(s: android.text.Editable?) {
-                if (!s.isNullOrEmpty()) {
-                    val amount = s.toString().toDoubleOrNull() ?: 0.0
-                    updateAmountDisplay(amount)
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString() != currentText) {
+                    amountEditText.removeTextChangedListener(this)
+                    val cleanString = s.toString().replace("[,]".toRegex(), "")
+                    if (cleanString.isNotEmpty()) {
+                        val formatted = formatToNepaliCurrency(cleanString.toLong())
+                        currentText = formatted
+                        amountEditText.setText(formatted)
+                        amountEditText.setSelection(formatted.length)
+                    }
+                    amountEditText.addTextChangedListener(this)
                 }
             }
         })
     }
 
     private fun handleContinueAction() {
-        val amount = amountEditText.text.toString().toDoubleOrNull()
+        val amount = amountEditText.text.toString().replace(",", "").toDoubleOrNull()
         val description = descriptionEditText.text.toString()
         val isRecurring = repeatSwitch.isChecked
         val category = (categorySpinner.selectedItem as? CategoryItem)?.name ?: ""
@@ -107,15 +115,16 @@ class IncomeActivity : AppCompatActivity() {
             return
         }
 
-        // Return the amount to the DashboardActivity
         val resultIntent = Intent()
         resultIntent.putExtra("INCOME_AMOUNT", amount)
         setResult(RESULT_OK, resultIntent)
-        finish()  // Close the IncomeActivity
+        finish()
     }
 
-    private fun updateAmountDisplay(amount: Double) {
-        amountEditText.hint = "NPR ${String.format("%.2f", amount)}"
+    private fun formatToNepaliCurrency(value: Long): String {
+        val symbols = DecimalFormatSymbols(Locale("en", "IN"))
+        val decimalFormat = DecimalFormat("##,##,###", symbols)
+        return decimalFormat.format(value)
     }
 
     private fun animateButton(view: View) {

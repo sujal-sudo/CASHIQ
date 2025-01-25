@@ -1,6 +1,8 @@
 package com.example.cashiq.UI.fragment
 
 import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -10,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.example.cashiq.UI.activity.LoginActivity
 import com.example.cashiq.databinding.FragmentProfileBinding
 
 class ProfileFragment : Fragment() {
@@ -33,6 +36,7 @@ class ProfileFragment : Fragment() {
 
         // Set the initial username
         binding.tvUsername.text = loggedInUsername
+
 
         // Set up click listeners
         setupClickListeners()
@@ -99,7 +103,16 @@ class ProfileFragment : Fragment() {
             .setTitle("Logout")
             .setMessage("Are you sure you want to logout?")
             .setPositiveButton("Yes") { _, _ ->
-                // Perform logout
+                // Clear user session or authentication data
+                val sharedPreferences = requireContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.clear() // Clear all stored data
+                editor.apply()
+
+                // Redirect to login or splash screen
+                val intent = Intent(requireContext(), LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
             }
             .setNegativeButton("No", null)
             .show()
