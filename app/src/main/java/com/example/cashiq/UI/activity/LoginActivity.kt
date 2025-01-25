@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.UI.activity.DashboardActivity
 import com.example.cashiq.UI.activity.ForgetPasswordActivity
@@ -31,6 +32,9 @@ class LoginActivity : AppCompatActivity() {
         firebaseDatabase = FirebaseDatabase.getInstance()
         databaseReference = firebaseDatabase.reference.child("users")
 
+
+
+
         binding.buttonLogin.setOnClickListener {
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
@@ -46,10 +50,20 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        binding.myConstraintLayout.setOnTouchListener { _, _ ->
-            hideKeyboardAndClearFocus()
-            true // Consume the touch event
+
+        binding.test.setOnClickListener{
+            startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
         }
+
+
+
+        binding.myConstraintLayout.setOnTouchListener { view, event ->
+            // Hide the keyboard when touched anywhere on ConstraintLayout
+            hideKeyboard(view)
+            true  // Return true to indicate that the touch event was consumed
+        }
+
+
 
         binding.textViewForgotPassword.setOnClickListener {
             startActivity(Intent(this@LoginActivity, ForgetPasswordActivity::class.java))
@@ -60,14 +74,32 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
 
         }
+
+        // Using OnBackPressedDispatcher to handle back press
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // If there's a currently focused view (keyboard is visible), hide the keyboard
+                val currentFocusView = currentFocus
+                if (currentFocusView != null) {
+                    hideKeyboard(currentFocusView)
+                } else {
+                    // If no keyboard is visible, allow the default back press action (app closing)
+                    isEnabled = false  // Disable this callback temporarily
+                    onBackPressedDispatcher.onBackPressed()  // Use onBackPressedDispatcher to call back press behavior
+                }
+            }
+        })
     }
 
-    private fun hideKeyboardAndClearFocus() {
+
+    private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = currentFocus ?: View(this)
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-        currentFocus?.clearFocus()
-        binding.myConstraintLayout.requestFocus()
+        val currentFocusView = currentFocus
+
+        // If there's a currently focused view, hide the keyboard using its window token
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
     }
 
     private fun loginUser(email: String, password: String) {
@@ -101,6 +133,8 @@ class LoginActivity : AppCompatActivity() {
                 }
             })
     }
+
+
 
     private fun isConnectedToInternet(): Boolean {
         val connectivityManager =

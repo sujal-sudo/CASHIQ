@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -25,6 +26,22 @@ class ForgetPasswordActivity : AppCompatActivity() {
         initializeViews()
         setOnClickListeners()
 
+
+        // Using OnBackPressedDispatcher to handle back press
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // If there's a currently focused view (keyboard is visible), hide the keyboard
+                val currentFocusView = currentFocus
+                if (currentFocusView != null) {
+                    hideKeyboard(currentFocusView)
+                } else {
+                    // If no keyboard is visible, allow the default back press action (app closing)
+                    isEnabled = false  // Disable this callback temporarily
+                    onBackPressedDispatcher.onBackPressed()  // Use onBackPressedDispatcher to call back press behavior
+                }
+            }
+        })
+
     }
 
     private fun initializeViews(){
@@ -34,24 +51,22 @@ class ForgetPasswordActivity : AppCompatActivity() {
 
     private fun setOnClickListeners(){
 
-        constraintLayout.setOnTouchListener { _, _ ->
-            hideKeyboardAndClearFocus()
-            true // Consume the touch event
+        constraintLayout.setOnTouchListener { view, event ->
+            // Hide the keyboard when touched anywhere on ConstraintLayout
+            hideKeyboard(view)
+            true  // Return true to indicate that the touch event was consumed
         }
     }
 
 
-    private fun hideKeyboardAndClearFocus() {
-        // Hide the keyboard
+    private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = currentFocus ?: View(this)
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+        val currentFocusView = currentFocus
 
-        // Clear focus from the currently focused view
-        currentFocus?.clearFocus()
-
-        //  set focus to the layout
-        constraintLayout.requestFocus()
+        // If there's a currently focused view, hide the keyboard using its window token
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
     }
 
 
