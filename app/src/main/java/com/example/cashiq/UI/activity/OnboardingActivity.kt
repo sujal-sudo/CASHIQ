@@ -54,7 +54,7 @@ class OnboardingActivity: AppCompatActivity() {
         signUpButton.setOnClickListener {
             val intent = Intent(this@OnboardingActivity, SignUpActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
 
 
@@ -63,7 +63,7 @@ class OnboardingActivity: AppCompatActivity() {
         loginButton.setOnClickListener {
             val intent = Intent(this@OnboardingActivity, LoginActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
 
 

@@ -53,12 +53,12 @@ class LoginActivity : AppCompatActivity() {
 
         binding.textViewForgotPassword.setOnClickListener {
             startActivity(Intent(this@LoginActivity, ForgetPasswordActivity::class.java))
-            finish()
+
         }
 
         binding.textViewSignUp.setOnClickListener {
             startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
-            finish()
+
         }
     }
 
