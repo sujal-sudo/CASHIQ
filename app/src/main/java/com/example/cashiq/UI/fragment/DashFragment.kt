@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.cashiq.utils.isNetworkAvailable
 import com.example.cashiq.R
 import com.example.cashiq.UI.activity.ExpenseActivity
 import com.example.cashiq.UI.activity.IncomeActivity
@@ -86,7 +87,7 @@ class DashFragment : Fragment() {
 
     private fun setupViewPagerWithTabs() {
         // Set up the adapter for ViewPager2
-        val adapter = DashPagerAdapter(this)
+        val adapter = DashPagerAdapter(this,requireContext())
         binding.pagerDash.adapter = adapter
 
         // Connect TabLayout with ViewPager2

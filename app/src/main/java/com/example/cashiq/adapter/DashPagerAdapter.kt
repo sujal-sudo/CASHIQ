@@ -1,22 +1,31 @@
 package com.example.cashiq.UI.fragment
 
+import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.cashiq.UI.fragment.TodayFragment
-import com.example.cashiq.UI.fragment.WeekFragment
-import com.example.cashiq.UI.fragment.MonthFragment
-import com.example.cashiq.UI.fragment.YearFragment
+import com.example.cashiq.utils.isNetworkAvailable
 
-class DashPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = 4 // Total number of tabs
+class DashPagerAdapter(fragment: Fragment, context: Context) : FragmentStateAdapter(fragment) {
+    private val fragmentList: List<Fragment>
 
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            0 -> TodayFragment()
-            1 -> WeekFragment()
-            2 -> MonthFragment()
-            3 -> YearFragment()
-            else -> TodayFragment() // Default case
+    init {
+        // Check internet connection and set the fragment list accordingly
+        fragmentList = if (isNetworkAvailable(context)) {
+            listOf(
+                TodayFragment(),
+                WeekFragment(),
+                MonthFragment(),
+                YearFragment()
+            )
+        } else {
+            listOf(NoInternetFragment()) // Only show NoInternetFragment if no connection
         }
     }
+
+    override fun getItemCount(): Int = fragmentList.size
+
+    override fun createFragment(position: Int): Fragment {
+        return fragmentList[position]
+    }
 }
+
