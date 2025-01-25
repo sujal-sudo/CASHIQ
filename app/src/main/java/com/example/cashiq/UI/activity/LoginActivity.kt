@@ -111,6 +111,15 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showNoInternetError() {
-        Toast.makeText(this, "No internet connection. Please check your connection and try again.", Toast.LENGTH_LONG).show()
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("No Internet Connection")
+        builder.setMessage("Please check your internet connection and try again.")
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss() // Close the dialog
+        }
+        builder.setCancelable(false) // Prevent dismissing the dialog by tapping outside
+        val dialog = builder.create()
+        dialog.show()
     }
+
 }
