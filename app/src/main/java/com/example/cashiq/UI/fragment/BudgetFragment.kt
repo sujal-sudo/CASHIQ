@@ -6,13 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.cashiq.R
 import com.example.cashiq.adapter.AdviceAdapter
-import java.text.SimpleDateFormat
 
 class BudgetFragment : Fragment() {
     override fun onCreateView(
@@ -39,10 +35,10 @@ class BudgetFragment : Fragment() {
 
         // Button click listener to navigate to the budget creation screen
         createBudgetButton.setOnClickListener {
-            // Navigate to CreateBudgetFragment
-            requireActivity().supportFragmentManager.beginTransaction()
+            // Ensure you are using the correct FragmentManager
+            parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, CreateBudgetFragment())
-                .addToBackStack(null)
+                .addToBackStack(null) // You can provide a name here if needed
                 .commit()
         }
 
