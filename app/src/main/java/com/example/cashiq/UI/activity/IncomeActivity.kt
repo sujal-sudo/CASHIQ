@@ -1,16 +1,20 @@
 package com.example.cashiq.UI.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.animation.ScaleAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.cashiq.R
 import com.example.cashiq.UI.CategoryItem
 import com.example.cashiq.adapter.CustomSpinnerAdapter
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -24,6 +28,7 @@ class IncomeActivity : AppCompatActivity() {
     private lateinit var continueButton: Button
     private lateinit var backButton: ImageButton
     private lateinit var repeatText: TextView
+    private lateinit var constraintLayout: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +48,8 @@ class IncomeActivity : AppCompatActivity() {
         backButton = findViewById(R.id.backButton)
         amountEditText = findViewById(R.id.amountText)
         repeatText = findViewById(R.id.repeat_text)
+        constraintLayout = findViewById(R.id.myConstraintLayout)
+
     }
 
     private fun setupSpinner() {
@@ -73,7 +80,26 @@ class IncomeActivity : AppCompatActivity() {
             animateButton(it)
             handleContinueAction()
         }
+
+        constraintLayout.setOnTouchListener { _, _ ->
+            hideKeyboardAndClearFocus()
+            true // Consume the touch event
+        }
     }
+
+    private fun hideKeyboardAndClearFocus() {
+        // Hide the keyboard
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = currentFocus ?: View(this)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Clear focus from the currently focused view
+        currentFocus?.clearFocus()
+
+        //  set focus to the layout
+        constraintLayout.requestFocus()
+    }
+
 
     private fun setupCurrencyFormatting() {
         amountEditText.addTextChangedListener(object : TextWatcher {

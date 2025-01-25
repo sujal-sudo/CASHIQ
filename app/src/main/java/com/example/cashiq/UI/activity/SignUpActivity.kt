@@ -1,8 +1,11 @@
 package com.example.cashiq.UI.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -76,20 +79,7 @@ class SignUpActivity : AppCompatActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-//        // Set click listener for the Sign Up button
-//        signupButton.setOnClickListener {
-//            val name = nameEditText.text.toString()
-//            val email = emailEditText.text.toString()
-//            val password = passwordEditText.text.toString()
-//
-//            // Check if the checkbox is checked
-//            if (termsCheckbox.isChecked) {
-//                Toast.makeText(this, "Signing up with $email", Toast.LENGTH_SHORT).show()
-//                // Add your sign-up logic here (e.g., validation, API call)
-//            } else {
-//                Toast.makeText(this, "Please agree to the terms", Toast.LENGTH_SHORT).show()
-//            }
-//        }
+
 
         // Set click listener for the Login TextView
         loginTextview.setOnClickListener {
@@ -100,6 +90,12 @@ class SignUpActivity : AppCompatActivity() {
         // Set click listener for the Google Sign Up button
         googleSignupButton.setOnClickListener {
             signInWithGoogle()
+        }
+
+        // Set click listener for the Constraint layout for hiding keyboard
+        binding.myConstraintLayout.setOnTouchListener { _, _ ->
+            hideKeyboardAndClearFocus()
+            true // Consume the touch event
         }
     }
     // This is the database Fucntion that checks the required fucntion to run the database
@@ -151,5 +147,18 @@ class SignUpActivity : AppCompatActivity() {
             Log.e("GoogleSignIn", "Sign-in failed", e)
             Toast.makeText(this, "Sign-in failed.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun hideKeyboardAndClearFocus() {
+        // Hide the keyboard
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = currentFocus ?: View(this)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Clear focus from the currently focused view
+        currentFocus?.clearFocus()
+
+        //  set focus to the layout
+        binding.myConstraintLayout.requestFocus()
     }
 }
