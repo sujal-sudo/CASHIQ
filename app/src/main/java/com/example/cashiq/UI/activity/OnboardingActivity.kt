@@ -1,6 +1,7 @@
 package com.example.cashiq.UI.activity
 
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -53,7 +54,7 @@ class OnboardingActivity: AppCompatActivity() {
         signUpButton.setOnClickListener {
             val intent = Intent(this@OnboardingActivity, SignUpActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
 
 
@@ -62,7 +63,7 @@ class OnboardingActivity: AppCompatActivity() {
         loginButton.setOnClickListener {
             val intent = Intent(this@OnboardingActivity, LoginActivity::class.java)
             startActivity(intent)
-            finish()
+
         }
 
 

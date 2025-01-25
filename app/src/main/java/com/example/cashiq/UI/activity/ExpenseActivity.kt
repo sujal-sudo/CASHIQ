@@ -1,5 +1,6 @@
 package com.example.cashiq.UI.activity
 
+import android.content.Context
 import com.example.cashiq.adapter.CustomSpinnerAdapter
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.animation.ScaleAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
@@ -16,8 +18,10 @@ import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.cashiq.R
 import com.example.cashiq.UI.CategoryItem
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -31,6 +35,8 @@ class ExpenseActivity : AppCompatActivity() {
     private lateinit var continueButton: Button
     private lateinit var backButton: ImageButton
     private lateinit var totalAmountTextView: TextView
+    private lateinit var constraintLayout: ConstraintLayout
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +53,9 @@ class ExpenseActivity : AppCompatActivity() {
     }
 
 
+
+
+
     private fun initializeViews(){
         // Initialize views
         amountEditText = findViewById(R.id.total_amount_text)
@@ -56,6 +65,7 @@ class ExpenseActivity : AppCompatActivity() {
         continueButton = findViewById(R.id.continue_button)
         backButton = findViewById(R.id.back_button)
         totalAmountTextView = findViewById(R.id.total_amount_text)
+        constraintLayout = findViewById(R.id.myConstraintLayout)
     }
 
     private fun setupSpinner(){
@@ -90,6 +100,24 @@ class ExpenseActivity : AppCompatActivity() {
             animateButton(it)
             handleContinueAction()
         }
+
+        constraintLayout.setOnTouchListener { _, _ ->
+            hideKeyboardAndClearFocus()
+            true // Consume the touch event
+        }
+    }
+
+    private fun hideKeyboardAndClearFocus() {
+        // Hide the keyboard
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = currentFocus ?: View(this)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Clear focus from the currently focused view
+        currentFocus?.clearFocus()
+
+        //  set focus to the layout
+        constraintLayout.requestFocus()
     }
     private fun animateButton(view: View) {
         val scaleAnimation = ScaleAnimation(
@@ -154,6 +182,8 @@ class ExpenseActivity : AppCompatActivity() {
         setResult(RESULT_OK, resultIntent)
         finish()  // Close the ExpenseActivity
     }
+
+
 
     private fun formatToNepaliCurrency(value: Long): String {
         val symbols = DecimalFormatSymbols(Locale("en", "IN"))
