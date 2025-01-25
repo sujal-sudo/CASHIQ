@@ -6,24 +6,15 @@
     android:layout_height="match_parent"
     android:background="#FFF8E1">
 
-    <!-- Back Arrow and Title -->
-
-    <!-- Spending Question -->
-
-    <!-- Amount Display -->
-
-    <!-- Category and Receive Alert Section -->
-
     <ImageView
         android:id="@+id/back_arrow"
         android:layout_width="43dp"
         android:layout_height="35dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="Back"
         android:src="@drawable/baseline_arrow_back_24"
-        android:tint="#FFA500"
-        app:layout_constraintMargin="16dp"
+        android:tint="@color/yellow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,12 +22,15 @@
         android:id="@+id/create_budget_title"
         android:layout_width="235dp"
         android:layout_height="49dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
         android:text="Create Budget"
         android:textColor="@color/yellow"
         android:textSize="35sp"
         android:textStyle="bold"
-        tools:layout_editor_absoluteX="103dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/back_arrow"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/spending_question"
@@ -47,17 +41,16 @@
         android:text="How much do you want to spend?"
         android:textColor="@color/yellow"
         android:textSize="16sp"
-        app:layout_constraintMarginTop="24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/create_budget_title" />
+        app:layout_constraintTop_toBottomOf="@+id/create_budget_title" />
 
     <EditText
         android:id="@+id/amount_display"
         android:layout_width="371dp"
         android:layout_height="81dp"
-        android:layout_marginStart="2dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="14dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="28dp"
         android:hint="NPR 0"
         android:inputType="number"
         android:padding="8dp"
@@ -65,7 +58,6 @@
         android:textColor="@color/white"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.454"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spending_question" />
 
@@ -91,9 +83,10 @@
                 android:id="@+id/category_dropdown"
                 android:layout_width="349dp"
                 android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/spinner_background"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintMarginBottom="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -124,23 +117,21 @@
                 android:id="@+id/slider"
                 android:layout_width="294dp"
                 android:layout_height="23dp"
-                android:layout_marginTop="96dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
                 android:max="100"
                 android:progress="0"
                 android:progressTint="#FFCC80"
                 android:thumbTint="#FFCC80"
-                android:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintMarginTop="16dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/receive_alert_switch" />
 
             <Button
                 android:id="@+id/continue_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:backgroundTint="#FFCC80"
                 android:elevation="4dp"
                 android:text="Continue"
