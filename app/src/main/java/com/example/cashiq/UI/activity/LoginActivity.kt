@@ -57,11 +57,7 @@ class LoginActivity : AppCompatActivity() {
 
 
 
-        binding.myConstraintLayout.setOnTouchListener { view, event ->
-            // Hide the keyboard when touched anywhere on ConstraintLayout
-            hideKeyboard(view)
-            true  // Return true to indicate that the touch event was consumed
-        }
+
 
 
 
@@ -73,6 +69,12 @@ class LoginActivity : AppCompatActivity() {
         binding.textViewSignUp.setOnClickListener {
             startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
 
+        }
+
+        binding.myConstraintLayout.setOnTouchListener { view, event ->
+            // Hide the keyboard when touched anywhere on ConstraintLayout
+            hideKeyboard(view)
+            true  // Return true to indicate that the touch event was consumed
         }
 
         // Using OnBackPressedDispatcher to handle back press
