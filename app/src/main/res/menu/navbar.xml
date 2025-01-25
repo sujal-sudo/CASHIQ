@@ -8,10 +8,21 @@
         android:title="Home"
         />
 
+ <item android:title="Budget"
+        android:id="@+id/NavBudget"
+        android:icon="@drawable/budget_nav"
+        />
+
+ <item android:title="Transaction"
+        android:id="@+id/NavTransaction"
+        android:icon="@drawable/transaction_nav"
+        />
 
     <item android:title="Profile"
         android:id="@+id/NavProfile"
         android:icon="@drawable/baseline_person_24"
         />
+
+
 
 </menu>
