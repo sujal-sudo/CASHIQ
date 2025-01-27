@@ -2,6 +2,8 @@ package com.example.cashiq.UI.activity
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -53,7 +55,9 @@ class SignUpActivity : AppCompatActivity() {
             val password = binding.signupPassword.text.toString()
 
             if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                signupUser(username, email, password)
+                if(isConnectedToInternet()){
+                signupUser(username, email, password)}
+                else(showNoInternetError())
             } else {
                 Toast.makeText(this@SignUpActivity, "All fields are mandatory ", Toast.LENGTH_SHORT)
                     .show()
@@ -178,4 +182,27 @@ class SignUpActivity : AppCompatActivity() {
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
     }
+
+
+    private fun isConnectedToInternet(): Boolean {
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        return networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private fun showNoInternetError() {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("No Internet Connection")
+        builder.setMessage("Please check your internet connection and try again.")
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss() // Close the dialog
+        }
+        builder.setCancelable(false) // Prevent dismissing the dialog by tapping outside
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+
 }
