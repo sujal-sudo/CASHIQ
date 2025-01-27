@@ -1,43 +1,50 @@
 package com.example.cashiq.UI.activity
 
-import android.app.Activity
+import com.example.cashiq.adapter.CustomSpinnerAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.animation.ScaleAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.Spinner
+import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.cashiq.R
 import com.example.cashiq.UI.CategoryItem
-import com.example.cashiq.adapter.CustomSpinnerAdapter
-import com.example.cashiq.databinding.ActivityExpenseBinding
-import com.example.cashiq.model.IncomeExpense
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 
 class ExpenseActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityExpenseBinding
-    private lateinit var databaseReference: DatabaseReference
-    private val userId: String by lazy {
-        FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    }
+    private lateinit var amountEditText: EditText
+    private lateinit var categorySpinner: Spinner
+    private lateinit var descriptionEditText: EditText
+    private lateinit var repeatSwitch: Switch
+    private lateinit var continueButton: Button
+    private lateinit var backButton: ImageButton
+    private lateinit var totalAmountTextView: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityExpenseBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_expense) // Ensure this matches the XML layout file name
 
-        // Initialize Firebase Database reference for expenses
-        databaseReference = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("expenses")
+        // Initialize views
+        amountEditText = findViewById(R.id.total_amount_text) // Correct ID from XML
+        categorySpinner = findViewById(R.id.category_spinner)
+        descriptionEditText = findViewById(R.id.description)
+        repeatSwitch = findViewById(R.id.repeat_transaction)
+        continueButton = findViewById(R.id.continue_button)
+        backButton = findViewById(R.id.back_button)
+        totalAmountTextView = findViewById(R.id.total_amount_text) // This might not be needed if using a different view
 
-        // Set up UI elements and listeners
-        setupSpinner()
-        setupListeners()
-    }
-
-    private fun setupSpinner() {
+        // Set up the Spinner with the CustomSpinnerAdapter
         val categories = listOf(
             CategoryItem("Food", R.drawable.baseline_food_24),
             CategoryItem("Shopping", R.drawable.shoppingcart),
@@ -46,31 +53,44 @@ class ExpenseActivity : AppCompatActivity() {
         )
 
         val adapter = CustomSpinnerAdapter(this, categories)
-        binding.categorySpinner.adapter = adapter
+        categorySpinner.adapter = adapter
 
-        binding.categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 // Handle category selection if needed
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-    }
 
-    private fun setupListeners() {
-        // Back button listener
-        binding.backButton.setOnClickListener {
+        // Set up the back button
+        backButton.setOnClickListener {
             finish() // Close the current activity
         }
 
-        // Continue button listener
-        binding.continueButton.setOnClickListener {
+        // Set up the button click listener
+        continueButton.setOnClickListener {
             animateButton(it)
             handleContinueAction()
         }
+
+        constraintLayout.setOnTouchListener { view, event ->
+            // Hide the keyboard when touched anywhere on ConstraintLayout
+            hideKeyboard(view)
+            true  // Return true to indicate that the touch event was consumed
+        }
     }
 
-    private fun animateButton(view: android.view.View) {
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = currentFocus
+
+        // If there's a currently focused view, hide the keyboard using its window token
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
+    private fun animateButton(view: View) {
         val scaleAnimation = ScaleAnimation(
             1f, 0.9f, 1f, 0.9f,
             ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
@@ -82,11 +102,35 @@ class ExpenseActivity : AppCompatActivity() {
         view.startAnimation(scaleAnimation)
     }
 
+    private fun setupCurrencyFormatting() {
+        amountEditText.addTextChangedListener(object : TextWatcher {
+            private var currentText = ""
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString() != currentText) {
+                    amountEditText.removeTextChangedListener(this)
+                    val cleanString = s.toString().replace("[,]".toRegex(), "")
+                    if (cleanString.isNotEmpty()) {
+                        val formatted = formatToNepaliCurrency(cleanString.toLong())
+                        currentText = formatted
+                        amountEditText.setText(formatted)
+                        amountEditText.setSelection(formatted.length)
+                    }
+                    amountEditText.addTextChangedListener(this)
+                }
+            }
+        })
+    }
+
     private fun handleContinueAction() {
-        val amount = binding.totalAmountText.text.toString().toDoubleOrNull()
-        val description = binding.description.text.toString()
-        val isRecurring = binding.repeatTransaction.isChecked
-        val category = (binding.categorySpinner.selectedItem as? CategoryItem)?.name ?: ""
+        val amount = amountEditText.text.toString().replace(",", "").toDoubleOrNull()
+        val description = descriptionEditText.text.toString()
+        val isRecurring = repeatSwitch.isChecked
+        val category = (categorySpinner.selectedItem as? CategoryItem)?.name ?: ""
 
         if (amount == null || amount <= 0) {
             Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
@@ -95,6 +139,11 @@ class ExpenseActivity : AppCompatActivity() {
 
         if (description.isEmpty()) {
             Toast.makeText(this, "Please enter a description", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (amount <= 0) {
+            totalAmountTextView.text = "Please enter a valid amount"
             return
         }
 
@@ -102,38 +151,14 @@ class ExpenseActivity : AppCompatActivity() {
         val resultIntent = Intent()
         resultIntent.putExtra("EXPENSE_AMOUNT", amount)
         setResult(RESULT_OK, resultIntent)
-        finish() // Close the ExpenseActivity
+        finish()  // Close the ExpenseActivity
     }
 
-    private fun saveExpenseData() {
-        val amount = binding.totalAmountText.text.toString().toDoubleOrNull()
-        val description = binding.description.text.toString()
-        val isRecurring = binding.repeatTransaction.isChecked
-        val category = (binding.categorySpinner.selectedItem as? CategoryItem)?.name ?: "Expense"
 
-        if (amount == null || amount <= 0) {
-            Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
-            return
-        }
 
-        if (description.isEmpty()) {
-            Toast.makeText(this, "Please enter a description", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val expenseData = IncomeExpense(amount, description, category, isRecurring)
-        val dbRef = FirebaseDatabase.getInstance().getReference("users/$userId/expenses")
-
-        dbRef.push().setValue(expenseData).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // Pass back the expense amount to DashboardActivity
-                setResult(Activity.RESULT_OK, intent.putExtra("EXPENSE_AMOUNT", amount))
-                Toast.makeText(this, "Expense saved successfully!", Toast.LENGTH_SHORT).show()
-                finish()
-            } else {
-                Toast.makeText(this, "Failed to save expense", Toast.LENGTH_SHORT).show()
-            }
-        }
+    private fun formatToNepaliCurrency(value: Long): String {
+        val symbols = DecimalFormatSymbols(Locale("en", "IN"))
+        val decimalFormat = DecimalFormat("##,##,###", symbols)
+        return decimalFormat.format(value)
     }
-
 }

@@ -1,9 +1,15 @@
 package com.example.cashiq.UI.activity
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
@@ -49,7 +55,9 @@ class SignUpActivity : AppCompatActivity() {
             val password = binding.signupPassword.text.toString()
 
             if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                signupUser(username, email, password)
+                if(isConnectedToInternet()){
+                signupUser(username, email, password)}
+                else(showNoInternetError())
             } else {
                 Toast.makeText(this@SignUpActivity, "All fields are mandatory ", Toast.LENGTH_SHORT)
                     .show()
@@ -76,20 +84,7 @@ class SignUpActivity : AppCompatActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-//        // Set click listener for the Sign Up button
-//        signupButton.setOnClickListener {
-//            val name = nameEditText.text.toString()
-//            val email = emailEditText.text.toString()
-//            val password = passwordEditText.text.toString()
-//
-//            // Check if the checkbox is checked
-//            if (termsCheckbox.isChecked) {
-//                Toast.makeText(this, "Signing up with $email", Toast.LENGTH_SHORT).show()
-//                // Add your sign-up logic here (e.g., validation, API call)
-//            } else {
-//                Toast.makeText(this, "Please agree to the terms", Toast.LENGTH_SHORT).show()
-//            }
-//        }
+
 
         // Set click listener for the Login TextView
         loginTextview.setOnClickListener {
@@ -101,6 +96,31 @@ class SignUpActivity : AppCompatActivity() {
         googleSignupButton.setOnClickListener {
             signInWithGoogle()
         }
+
+        // Set click listener for the Constraint layout for hiding keyboard
+        binding.myConstraintLayout.setOnTouchListener { view, event ->
+            // Hide the keyboard when touched anywhere on ConstraintLayout
+            hideKeyboard(view)
+            true  // Return true to indicate that the touch event was consumed
+        }
+
+        // Using OnBackPressedDispatcher to handle back press
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // If there's a currently focused view (keyboard is visible), hide the keyboard
+                val currentFocusView = currentFocus
+                if (currentFocusView != null) {
+                    hideKeyboard(currentFocusView)
+                } else {
+                    // If no keyboard is visible, allow the default back press action (app closing)
+                    isEnabled = false  // Disable this callback temporarily
+                    onBackPressedDispatcher.onBackPressed()  // Use onBackPressedDispatcher to call back press behavior
+                }
+            }
+        })
+
+
+
     }
     // This is the database Fucntion that checks the required fucntion to run the database
     private fun signupUser(username: String, password: String, email: String){
@@ -152,4 +172,37 @@ class SignUpActivity : AppCompatActivity() {
             Toast.makeText(this, "Sign-in failed.", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = currentFocus
+
+        // If there's a currently focused view, hide the keyboard using its window token
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
+
+
+    private fun isConnectedToInternet(): Boolean {
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        return networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private fun showNoInternetError() {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("No Internet Connection")
+        builder.setMessage("Please check your internet connection and try again.")
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss() // Close the dialog
+        }
+        builder.setCancelable(false) // Prevent dismissing the dialog by tapping outside
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+
 }
