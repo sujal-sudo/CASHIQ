@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.cashiq.utils.isNetworkAvailable
-import com.example.cashiq.R
 import com.example.cashiq.UI.activity.ExpenseActivity
 import com.example.cashiq.UI.activity.IncomeActivity
 import com.example.cashiq.databinding.FragmentDashBinding
