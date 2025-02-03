@@ -1,13 +1,13 @@
 package com.example.cashiq.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import com.example.cashiq.model.BudgetModel1
+import com.example.cashiq.model.BudgetModel
 import com.example.cashiq.repository.BudgetRepository
 
 class BudgetViewModel(private val repo: BudgetRepository) {
 
     // Add Budget
-    fun addBudget(budget: BudgetModel1, callback: (Boolean, String) -> Unit) {
+    fun addBudget(budget: BudgetModel, callback: (Boolean, String) -> Unit) {
         repo.addBudget(budget, callback)
     }
 
@@ -22,13 +22,13 @@ class BudgetViewModel(private val repo: BudgetRepository) {
     }
 
     // LiveData for a single budget
-    private var _budget = MutableLiveData<BudgetModel1?>()
-    var budget = MutableLiveData<BudgetModel1?>()
+    private var _budget = MutableLiveData<BudgetModel?>()
+    var budget = MutableLiveData<BudgetModel?>()
         get() = _budget
 
     // LiveData for all budgets
-    private var _allBudgets = MutableLiveData<List<BudgetModel1>>()
-    var allBudgets = MutableLiveData<List<BudgetModel1>>()
+    private var _allBudgets = MutableLiveData<List<BudgetModel>>()
+    var allBudgets = MutableLiveData<List<BudgetModel>>()
         get() = _allBudgets
 
     // LiveData for loading state

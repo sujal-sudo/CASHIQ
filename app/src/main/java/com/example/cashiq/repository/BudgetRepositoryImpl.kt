@@ -1,6 +1,6 @@
 package com.example.cashiq.repository
 
-import com.example.cashiq.model.BudgetModel1
+import com.example.cashiq.model.BudgetModel
 import com.google.firebase.database.*
 
 class BudgetRepositoryImpl : BudgetRepository {
@@ -8,7 +8,7 @@ class BudgetRepositoryImpl : BudgetRepository {
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private val ref: DatabaseReference = database.reference.child("budgets")
 
-    override fun addBudget(budget: BudgetModel1, callback: (Boolean, String) -> Unit) {
+    override fun addBudget(budget: BudgetModel, callback: (Boolean, String) -> Unit) {
         val id = ref.push().key.toString()
         val newBudget = budget.copy(budgetId = id)
 
@@ -41,11 +41,11 @@ class BudgetRepositoryImpl : BudgetRepository {
         }
     }
 
-    override fun getBudgetById(budgetId: String, callback: (BudgetModel1?, Boolean, String) -> Unit) {
+    override fun getBudgetById(budgetId: String, callback: (BudgetModel?, Boolean, String) -> Unit) {
         ref.child(budgetId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val budget = snapshot.getValue(BudgetModel1::class.java)
+                    val budget = snapshot.getValue(BudgetModel::class.java)
                     callback(budget, true, "Budget fetched successfully")
                 } else {
                     callback(null, false, "Budget not found")
@@ -58,13 +58,13 @@ class BudgetRepositoryImpl : BudgetRepository {
         })
     }
 
-    override fun getAllBudgets(callback: (List<BudgetModel1>?, Boolean, String) -> Unit) {
+    override fun getAllBudgets(callback: (List<BudgetModel>?, Boolean, String) -> Unit) {
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val budgets = mutableListOf<BudgetModel1>()
+                    val budgets = mutableListOf<BudgetModel>()
                     for (eachData in snapshot.children) {
-                        val budget = eachData.getValue(BudgetModel1::class.java)
+                        val budget = eachData.getValue(BudgetModel::class.java)
                         if (budget != null) {
                             budgets.add(budget)
                         }
