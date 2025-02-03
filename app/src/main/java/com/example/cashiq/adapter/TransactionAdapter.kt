@@ -7,7 +7,7 @@ import com.example.cashiq.R
 import com.example.cashiq.databinding.ItemTransactionBinding
 import com.example.cashiq.model.Transaction
 
-class TransactionAdapter(private val transactions: List<Transaction>) :
+class TransactionAdapter(private var transactions: List<Transaction>) :
     RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -25,12 +25,18 @@ class TransactionAdapter(private val transactions: List<Transaction>) :
 
     override fun getItemCount() = transactions.size
 
+    // Method to update data dynamically (used for filtering transactions)
+    fun updateData(newTransactions: List<Transaction>) {
+        transactions = newTransactions
+        notifyDataSetChanged()
+    }
+
     class TransactionViewHolder(private val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(transaction: Transaction) {
             binding.apply {
-                // Set the icon based on income/expense
+                // Set the icon based on whether it's an income or expense
                 val iconRes = if (transaction.isIncome) R.drawable.income else R.drawable.expence
                 transactionIcon.setImageResource(iconRes)
 
@@ -44,14 +50,22 @@ class TransactionAdapter(private val transactions: List<Transaction>) :
                 // Set transaction title (e.g., category)
                 transactionTitle.text = transaction.category
 
-                // Set description and time (you can modify the description logic)
-                transactionDescription.text = if (transaction.isIncome) "Income received" else "Expense recorded"
+                // Set the description or fallback to a default based on income/expense
+                transactionDescription.text = if (!transaction.description.isNullOrBlank()) {
+                    transaction.description
+                } else {
+                    if (transaction.isIncome) "Income received" else "Expense recorded"
+                }
+
+                // Set the date
                 transactionTime.text = transaction.date
 
-                // Format and set the amount
-                transactionAmount.text =
-                    if (transaction.isIncome) "+NPR ${String.format("%.2f", transaction.amount)}"
-                    else "-NPR ${String.format("%.2f", transaction.amount)}"
+                // Format and display the amount
+                transactionAmount.text = if (transaction.isIncome) {
+                    "+NPR ${String.format("%.2f", transaction.amount)}"
+                } else {
+                    "-NPR ${String.format("%.2f", transaction.amount)}"
+                }
             }
         }
     }

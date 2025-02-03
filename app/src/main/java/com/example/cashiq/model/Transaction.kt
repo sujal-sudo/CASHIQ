@@ -1,15 +1,11 @@
 package com.example.cashiq.model
-import com.example.cashiq.model.UserData
-import com.google.firebase.database.DatabaseReference
-
-private lateinit var databaseReference: DatabaseReference
 
 data class Transaction(
-    val transactionId : String = "",
-    val userId: String? = null,
-    val amount: Double,
-    val category: String,
-    val date: String,
-    val isIncome: Boolean,
-    val description: String = "" // Optional: Add a description if needed
+    val transactionId: String = "",  // Unique ID for each transaction
+    val userId: String? = null,       // User ID linked to the transaction
+    val amount: Double = 0.0,         // Amount of transaction
+    val category: String = "",        // Category (e.g., Salary, Food)
+    val date: String = "",            // Date of transaction (format: yyyy-MM-dd)
+    val isIncome: Boolean = false,    // True = Income, False = Expense
+    val description: String = ""      // Optional description
 )
