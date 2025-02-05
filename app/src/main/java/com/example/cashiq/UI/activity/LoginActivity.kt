@@ -1,5 +1,6 @@
 package com.example.cashiq.UI.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -13,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.UI.activity.DashboardActivity
 import com.example.cashiq.UI.activity.ForgetPasswordActivity
 import com.example.cashiq.UI.activity.SignUpActivity
-import com.example.cashiq.databinding.ActivityLoginBinding
 import com.example.cashiq.model.UserData
+
 import com.google.firebase.database.*
 
 class LoginActivity : AppCompatActivity() {
@@ -93,10 +94,6 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    private fun loginUser(email: String, password: String) {
-
-    }
-
 
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -108,37 +105,37 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-//    private fun loginUser(email: String, password: String) {
-//        databaseReference.orderByChild("email").equalTo(email)
-//            .addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    if (snapshot.exists()) {
-//                        for (userSnapshot in snapshot.children) {
-//                            val userData = userSnapshot.getValue(UserData::class.java)
-//                            if (userData != null && userData.email == email && userData.password == password) {
-//                                Toast.makeText(
-//                                    this@LoginActivity,
-//                                    "Login Successful",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                                startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
-//                                finish()
-//                                return
-//                            }
-//                        }
-//                    }
-//                    Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
-//                }
-//
-//                override fun onCancelled(databaseError: DatabaseError) {
-//                    Toast.makeText(
-//                        this@LoginActivity,
-//                        "Database Error: ${databaseError.message}",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            })
-//    }
+    private fun loginUser(email: String, password: String) {
+        databaseReference.orderByChild("email").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (userSnapshot in snapshot.children) {
+                            val userData = userSnapshot.getValue(UserData::class.java)
+                            if (userData != null && userData.email == email && userData.password == password) {
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Login Successful",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
+                                finish()
+                                return
+                            }
+                        }
+                    }
+                    Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Database Error: ${databaseError.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+    }
 
 
 
