@@ -5,39 +5,58 @@ import com.google.firebase.database.*
 
 class NoteRepositoryImpl : NoteRepository {
 
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("notes")
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val ref: DatabaseReference = database.reference.child("notes")
 
     override fun addNote(note: NoteModel, callback: (Boolean, String) -> Unit) {
-        val id = database.push().key.toString()
+        val id = ref.push().key.toString()
         val noteWithId = note.copy(id = id)
-        database.child(id).setValue(noteWithId).addOnCompleteListener {
-            if (it.isSuccessful) callback(true, "Note added successfully.")
-            else callback(false, it.exception?.message ?: "Error adding note.")
-        }
-    }
 
-    override fun getNoteById(noteId: String, callback: (NoteModel?, Boolean, String) -> Unit) {
-        database.child(noteId).get().addOnSuccessListener {
-            if (it.exists()) {
-                val note = it.getValue(NoteModel::class.java)
-                callback(note, true, "Note fetched successfully.")
+        ref.child(id).setValue(noteWithId).addOnCompleteListener {
+            if (it.isSuccessful) {
+                callback(true, "Note added successfully.")
             } else {
-                callback(null, false, "Note not found.")
+                callback(false, "${it.exception?.message}")
             }
-        }.addOnFailureListener {
-            callback(null, false, it.message ?: "Error fetching note.")
         }
     }
 
-    override fun getAllNotes(userId: String, callback: (List<NoteModel>?, Boolean, String) -> Unit) {
-        database.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+    override fun updateNote(
+        noteId: String,
+        data: MutableMap<String, Any>,
+        callback: (Boolean, String) -> Unit
+    ) {
+        ref.child(noteId).updateChildren(data).addOnCompleteListener {
+            if (it.isSuccessful) {
+                callback(true, "Note updated successfully.")
+            } else {
+                callback(false, "${it.exception?.message}")
+            }
+        }
+    }
+
+    override fun deleteNote(noteId: String, callback: (Boolean, String) -> Unit) {
+        ref.child(noteId).removeValue().addOnCompleteListener {
+            if (it.isSuccessful) {
+                callback(true, "Note deleted successfully.")
+            } else {
+                callback(false, "${it.exception?.message}")
+            }
+        }
+    }
+
+    override fun getNoteById(
+        noteId: String,
+        callback: (NoteModel?, Boolean, String) -> Unit
+    ) {
+        ref.child(noteId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val notes = mutableListOf<NoteModel>()
-                for (data in snapshot.children) {
-                    val note = data.getValue(NoteModel::class.java)
-                    note?.let { notes.add(it) }
+                if (snapshot.exists()) {
+                    val note = snapshot.getValue(NoteModel::class.java)
+                    callback(note, true, "Note fetched successfully.")
+                } else {
+                    callback(null, false, "Note not found.")
                 }
-                callback(notes, true, "Notes fetched successfully.")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -46,17 +65,24 @@ class NoteRepositoryImpl : NoteRepository {
         })
     }
 
-    override fun updateNote(noteId: String, data: Map<String, Any>, callback: (Boolean, String) -> Unit) {
-        database.child(noteId).updateChildren(data).addOnCompleteListener {
-            if (it.isSuccessful) callback(true, "Note updated successfully.")
-            else callback(false, it.exception?.message ?: "Update failed.")
-        }
-    }
+    override fun getAllNotes(userId: String, callback: (List<NoteModel>?, Boolean, String) -> Unit) {
+        ref.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val notes = mutableListOf<NoteModel>()
+                    for (eachData in snapshot.children) {
+                        val note = eachData.getValue(NoteModel::class.java)
+                        note?.let { notes.add(it) }
+                    }
+                    callback(notes, true, "Notes fetched successfully.")
+                } else {
+                    callback(null, false, "No notes found.")
+                }
+            }
 
-    override fun deleteNote(noteId: String, callback: (Boolean, String) -> Unit) {
-        database.child(noteId).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) callback(true, "Note deleted successfully.")
-            else callback(false, it.exception?.message ?: "Error deleting note.")
-        }
+            override fun onCancelled(error: DatabaseError) {
+                callback(null, false, error.message)
+            }
+        })
     }
 }

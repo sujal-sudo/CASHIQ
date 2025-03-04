@@ -11,8 +11,11 @@ class NoteViewModel : ViewModel() {
 
     private val noteRepository: NoteRepository = NoteRepositoryImpl()
 
-    private val _notes = MutableLiveData<List<NoteModel>?>()
-    val notes: LiveData<List<NoteModel>?> get() = _notes
+    private val _note = MutableLiveData<NoteModel?>()
+    val note: LiveData<NoteModel?> get() = _note
+
+    private val _allNotes = MutableLiveData<List<NoteModel>>()
+    val allNotes: LiveData<List<NoteModel>> get() = _allNotes
 
     private val _operationStatus = MutableLiveData<Pair<Boolean, String>>()
     val operationStatus: LiveData<Pair<Boolean, String>> get() = _operationStatus
@@ -23,21 +26,7 @@ class NoteViewModel : ViewModel() {
         }
     }
 
-    fun getNoteById(noteId: String) {
-        noteRepository.getNoteById(noteId) { note, success, message ->
-            if (success) _notes.postValue(listOf(note!!))
-            else _operationStatus.postValue(Pair(false, message))
-        }
-    }
-
-    fun getAllNotes(userId: String) {
-        noteRepository.getAllNotes(userId) { noteList, success, message ->
-            if (success) _notes.postValue(noteList)
-            else _operationStatus.postValue(Pair(false, message))
-        }
-    }
-
-    fun updateNote(noteId: String, data: Map<String, Any>) {
+    fun updateNote(noteId: String, data: MutableMap<String, Any>) {
         noteRepository.updateNote(noteId, data) { success, message ->
             _operationStatus.postValue(Pair(success, message))
         }
@@ -45,6 +34,20 @@ class NoteViewModel : ViewModel() {
 
     fun deleteNote(noteId: String) {
         noteRepository.deleteNote(noteId) { success, message ->
+            _operationStatus.postValue(Pair(success, message))
+        }
+    }
+
+    fun getNoteById(noteId: String) {
+        noteRepository.getNoteById(noteId) { note, success, message ->
+            _note.postValue(note)
+            _operationStatus.postValue(Pair(success, message))
+        }
+    }
+
+    fun getAllNotes(userId: String) {
+        noteRepository.getAllNotes(userId) { notes, success, message ->
+            _allNotes.postValue(notes ?: emptyList())
             _operationStatus.postValue(Pair(success, message))
         }
     }
