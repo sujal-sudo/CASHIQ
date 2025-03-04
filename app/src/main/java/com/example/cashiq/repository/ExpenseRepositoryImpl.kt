@@ -5,39 +5,37 @@ import com.google.firebase.database.*
 
 class ExpenseRepositoryImpl : ExpenseRepository {
 
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("expenses")
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val ref: DatabaseReference = database.reference.child("expenses")
 
     override fun addExpense(expense: ExpenseModel, callback: (Boolean, String) -> Unit) {
-        val id = database.push().key.toString()
+        val id = ref.push().key.toString()
         val expenseWithId = expense.copy(id = id)
-        database.child(id).setValue(expenseWithId).addOnCompleteListener {
+        ref.child(id).setValue(expenseWithId).addOnCompleteListener {
             if (it.isSuccessful) callback(true, "Expense added successfully.")
             else callback(false, it.exception?.message ?: "Error adding expense.")
         }
     }
 
-    override fun getExpenseById(expenseId: String, callback: (ExpenseModel?, Boolean, String) -> Unit) {
-        database.child(expenseId).get().addOnSuccessListener {
-            if (it.exists()) {
-                val expense = it.getValue(ExpenseModel::class.java)
-                callback(expense, true, "Expense fetched successfully.")
-            } else {
-                callback(null, false, "Expense not found.")
-            }
-        }.addOnFailureListener {
-            callback(null, false, it.message ?: "Error fetching expense.")
+    override fun updateExpense(expenseId: String, data: MutableMap<String, Any>, callback: (Boolean, String) -> Unit) {
+        ref.child(expenseId).updateChildren(data).addOnCompleteListener {
+            if (it.isSuccessful) callback(true, "Expense updated successfully.")
+            else callback(false, it.exception?.message ?: "Error updating expense.")
         }
     }
 
-    override fun getAllExpenses(userId: String, callback: (List<ExpenseModel>?, Boolean, String) -> Unit) {
-        database.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+    override fun deleteExpense(expenseId: String, callback: (Boolean, String) -> Unit) {
+        ref.child(expenseId).removeValue().addOnCompleteListener {
+            if (it.isSuccessful) callback(true, "Expense deleted successfully.")
+            else callback(false, it.exception?.message ?: "Error deleting expense.")
+        }
+    }
+
+    override fun getExpenseById(expenseId: String, callback: (ExpenseModel?, Boolean, String) -> Unit) {
+        ref.child(expenseId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val expenses = mutableListOf<ExpenseModel>()
-                for (data in snapshot.children) {
-                    val expense = data.getValue(ExpenseModel::class.java)
-                    expense?.let { expenses.add(it) }
-                }
-                callback(expenses, true, "Expenses fetched successfully.")
+                val expense = snapshot.getValue(ExpenseModel::class.java)
+                callback(expense, expense != null, "Expense fetched successfully.")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -46,17 +44,16 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         })
     }
 
-    override fun updateExpense(expenseId: String, data: Map<String, Any>, callback: (Boolean, String) -> Unit) {
-        database.child(expenseId).updateChildren(data).addOnCompleteListener {
-            if (it.isSuccessful) callback(true, "Expense updated successfully.")
-            else callback(false, it.exception?.message ?: "Update failed.")
-        }
-    }
+    override fun getAllExpenses(userId: String, callback: (List<ExpenseModel>?, Boolean, String) -> Unit) {
+        ref.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val expenses = snapshot.children.mapNotNull { it.getValue(ExpenseModel::class.java) }
+                callback(expenses, true, "Expenses fetched successfully.")
+            }
 
-    override fun deleteExpense(expenseId: String, callback: (Boolean, String) -> Unit) {
-        database.child(expenseId).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) callback(true, "Expense deleted successfully.")
-            else callback(false, it.exception?.message ?: "Error deleting expense.")
-        }
+            override fun onCancelled(error: DatabaseError) {
+                callback(null, false, error.message)
+            }
+        })
     }
 }

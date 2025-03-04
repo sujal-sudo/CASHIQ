@@ -9,43 +9,55 @@ import com.example.cashiq.repository.ExpenseRepositoryImpl
 
 class ExpenseViewModel : ViewModel() {
 
-    private val expenseRepository: ExpenseRepository = ExpenseRepositoryImpl()
+    private val expenseRepo: ExpenseRepository = ExpenseRepositoryImpl()
 
-    private val _expenses = MutableLiveData<List<ExpenseModel>?>()
-    val expenses: LiveData<List<ExpenseModel>?> get() = _expenses
+    private val _expenses = MutableLiveData<List<ExpenseModel>>()
+    val expenses: LiveData<List<ExpenseModel>> = _expenses
 
-    private val _operationStatus = MutableLiveData<Pair<Boolean, String>>()
-    val operationStatus: LiveData<Pair<Boolean, String>> get() = _operationStatus
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> = _loading
+
+    private val _errorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> = _errorMessage
+
+    private val _operationStatus = MutableLiveData<Pair<Boolean, String>>() // Fix added
+    val operationStatus: LiveData<Pair<Boolean, String>> = _operationStatus
+
+    fun fetchExpenses(userId: String) {
+        _loading.postValue(true)
+        expenseRepo.getAllExpenses(userId) { list, success, message ->
+            _loading.postValue(false)
+            if (success) {
+                _expenses.postValue(list)
+            } else {
+                _errorMessage.postValue(message)
+            }
+        }
+    }
 
     fun addExpense(expense: ExpenseModel) {
-        expenseRepository.addExpense(expense) { success, message ->
-            _operationStatus.postValue(Pair(success, message))
+        _loading.postValue(true)
+        expenseRepo.addExpense(expense) { success, message ->
+            _loading.postValue(false)
+            _operationStatus.postValue(Pair(success, message)) // Fix added
+            if (success) fetchExpenses(expense.userId)
         }
     }
 
-    fun getExpenseById(expenseId: String) {
-        expenseRepository.getExpenseById(expenseId) { expense, success, message ->
-            if (success) _expenses.postValue(listOf(expense!!))
-            else _operationStatus.postValue(Pair(false, message))
+    fun updateExpense(expenseId: String, data: MutableMap<String, Any>) {
+        _loading.postValue(true)
+        expenseRepo.updateExpense(expenseId, data) { success, message ->
+            _loading.postValue(false)
+            _operationStatus.postValue(Pair(success, message)) // Fix added
         }
     }
 
-    fun getAllExpenses(userId: String) {
-        expenseRepository.getAllExpenses(userId) { expenseList, success, message ->
-            if (success) _expenses.postValue(expenseList)
-            else _operationStatus.postValue(Pair(false, message))
-        }
-    }
-
-    fun updateExpense(expenseId: String, data: Map<String, Any>) {
-        expenseRepository.updateExpense(expenseId, data) { success, message ->
-            _operationStatus.postValue(Pair(success, message))
-        }
-    }
-
-    fun deleteExpense(expenseId: String) {
-        expenseRepository.deleteExpense(expenseId) { success, message ->
-            _operationStatus.postValue(Pair(success, message))
+    fun deleteExpense(expenseId: String, userId: String) {
+        _loading.postValue(true)
+        expenseRepo.deleteExpense(expenseId) { success, message ->
+            _loading.postValue(false)
+            _operationStatus.postValue(Pair(success, message)) // Fix added
+            if (success) fetchExpenses(userId)
         }
     }
 }

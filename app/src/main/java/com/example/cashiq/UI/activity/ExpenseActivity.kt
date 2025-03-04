@@ -118,7 +118,7 @@ class ExpenseActivity : AppCompatActivity() {
     private fun handleContinueAction() {
         val amount = amountEditText.text.toString().replace(",", "").toDoubleOrNull()
         val description = descriptionEditText.text.toString()
-        val category = (categorySpinner.selectedItem as? CategoryItem)?.name ?: ""
+        val selectedCategory = categorySpinner.selectedItem as? CategoryItem
 
         if (amount == null || amount <= 0) {
             Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
@@ -127,6 +127,11 @@ class ExpenseActivity : AppCompatActivity() {
 
         if (description.isEmpty()) {
             Toast.makeText(this, "Please enter a description", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (selectedCategory == null) {
+            Toast.makeText(this, "Please select a valid category", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -142,6 +147,7 @@ class ExpenseActivity : AppCompatActivity() {
         val newExpense = ExpenseModel(
             id = "",
             amount = amount.toInt(),
+            category = selectedCategory.name, // Ensure category is stored
             expenseDate = formattedDate,
             expenseNote = description,
             userId = userId

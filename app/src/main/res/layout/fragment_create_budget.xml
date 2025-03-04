@@ -14,9 +14,9 @@
         android:layout_marginTop="16dp"
         android:contentDescription="Back"
         android:src="@drawable/baseline_arrow_back_24"
+        android:tint="@color/yellow"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/yellow" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/create_budget_title"
@@ -37,8 +37,8 @@
         android:id="@+id/spending_question"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="276dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="160dp"
         android:text="How much do you want to spend?"
         android:textColor="@color/yellow"
         android:textSize="16sp"
@@ -56,7 +56,7 @@
         android:inputType="number"
         android:padding="8dp"
         android:selectAllOnFocus="true"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,20 +64,20 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/category_card"
-        android:layout_width="381dp"
-        android:layout_height="218dp"
+        android:layout_width="376dp"
+        android:layout_height="243dp"
         android:layout_margin="16dp"
+        android:layout_marginTop="156dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.971">
+        app:layout_constraintTop_toBottomOf="@+id/amount_display">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="236dp"
             android:padding="16dp">
 
             <Spinner
@@ -120,7 +120,7 @@
                 android:layout_width="294dp"
                 android:layout_height="23dp"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 android:max="100"
                 android:progress="0"
                 android:progressTint="#FFCC80"
@@ -133,13 +133,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="14dp"
                 android:backgroundTint="#FFCC80"
                 android:elevation="4dp"
                 android:text="Continue"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.187"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/slider" />
         </androidx.constraintlayout.widget.ConstraintLayout>
