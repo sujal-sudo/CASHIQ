@@ -1,7 +1,6 @@
 package com.example.cashiq.UI.activity
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,15 +8,19 @@ import android.view.View
 import android.view.animation.ScaleAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.cashiq.R
 import com.example.cashiq.UI.CategoryItem
 import com.example.cashiq.adapter.CustomSpinnerAdapter
-import com.google.android.material.internal.ViewUtils.hideKeyboard
+import com.example.cashiq.model.IncomeModel
+import com.example.cashiq.viewmodel.IncomeViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class IncomeActivity : AppCompatActivity() {
@@ -28,8 +31,9 @@ class IncomeActivity : AppCompatActivity() {
     private lateinit var repeatSwitch: Switch
     private lateinit var continueButton: Button
     private lateinit var backButton: ImageButton
-    private lateinit var repeatText: TextView
     private lateinit var constraintLayout: ConstraintLayout
+
+    private val incomeViewModel: IncomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,23 +43,7 @@ class IncomeActivity : AppCompatActivity() {
         setupSpinner()
         setupClickListeners()
         setupCurrencyFormatting()
-
-
-
-        // Using OnBackPressedDispatcher to handle back press
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // If there's a currently focused view (keyboard is visible), hide the keyboard
-                val currentFocusView = currentFocus
-                if (currentFocusView != null) {
-                    hideKeyboard(currentFocusView)
-                } else {
-                    // If no keyboard is visible, allow the default back press action (app closing)
-                    isEnabled = false  // Disable this callback temporarily
-                    onBackPressedDispatcher.onBackPressed()  // Use onBackPressedDispatcher to call back press behavior
-                }
-            }
-        })
+        observeViewModel()
     }
 
     private fun initializeViews() {
@@ -65,9 +53,7 @@ class IncomeActivity : AppCompatActivity() {
         continueButton = findViewById(R.id.continue_button)
         backButton = findViewById(R.id.backButton)
         amountEditText = findViewById(R.id.amountText)
-        repeatText = findViewById(R.id.repeat_text)
         constraintLayout = findViewById(R.id.myConstraintLayout)
-
     }
 
     private fun setupSpinner() {
@@ -81,12 +67,6 @@ class IncomeActivity : AppCompatActivity() {
         )
         val adapter = CustomSpinnerAdapter(this, categories)
         categorySpinner.adapter = adapter
-
-        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {}
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
     }
 
     private fun setupClickListeners() {
@@ -99,23 +79,18 @@ class IncomeActivity : AppCompatActivity() {
             handleContinueAction()
         }
 
-        constraintLayout.setOnTouchListener { view, event ->
-            // Hide the keyboard when touched anywhere on ConstraintLayout
+        constraintLayout.setOnTouchListener { view, _ ->
             hideKeyboard(view)
-            true  // Return true to indicate that the touch event was consumed
+            true
         }
     }
 
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val currentFocusView = currentFocus
-
-        // If there's a currently focused view, hide the keyboard using its window token
-        currentFocusView?.let {
+        currentFocus?.let {
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
     }
-
 
     private fun setupCurrencyFormatting() {
         amountEditText.addTextChangedListener(object : TextWatcher {
@@ -144,7 +119,6 @@ class IncomeActivity : AppCompatActivity() {
     private fun handleContinueAction() {
         val amount = amountEditText.text.toString().replace(",", "").toDoubleOrNull()
         val description = descriptionEditText.text.toString()
-        val isRecurring = repeatSwitch.isChecked
         val category = (categorySpinner.selectedItem as? CategoryItem)?.name ?: ""
 
         if (amount == null || amount <= 0) {
@@ -157,10 +131,36 @@ class IncomeActivity : AppCompatActivity() {
             return
         }
 
-        val resultIntent = Intent()
-        resultIntent.putExtra("INCOME_AMOUNT", amount)
-        setResult(RESULT_OK, resultIntent)
-        finish()
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+        if (userId.isEmpty()) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val formattedDate = getFormattedDate()
+
+        val newIncome = IncomeModel(
+            id = "",
+            amount = amount.toInt(),
+            incomeDate = formattedDate,
+            incomeNote = description,
+            userId = userId
+        )
+
+        incomeViewModel.addIncome(newIncome)
+    }
+
+    private fun observeViewModel() {
+        incomeViewModel.operationStatus.observe(this) { (success, message) ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            if (success) finish()
+        }
+    }
+
+    private fun getFormattedDate(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        return dateFormat.format(Date())
     }
 
     private fun formatToNepaliCurrency(value: Long): String {
