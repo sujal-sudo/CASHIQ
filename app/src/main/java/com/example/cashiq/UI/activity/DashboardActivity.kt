@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
 import com.example.cashiq.UI.fragment.BudgetFragment
 import com.example.cashiq.UI.fragment.DashFragment
+import com.example.cashiq.UI.fragment.NoteFragment
 import com.example.cashiq.UI.fragment.ProfileFragment
 import com.example.cashiq.UI.fragment.TransactionFragment
 import com.example.cashiq.databinding.ActivityDashboardBinding
@@ -56,6 +57,12 @@ class DashboardActivity : AppCompatActivity() {
                     // Navigate to ProfileFragment
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.dashframe, TransactionFragment())
+                        .commit()
+                    true
+                }R.id.NavAdd -> {
+                    // Navigate to ProfileFragment
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.dashframe, NoteFragment())
                         .commit()
                     true
                 }

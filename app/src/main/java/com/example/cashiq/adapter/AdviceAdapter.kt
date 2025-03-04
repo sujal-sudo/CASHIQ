@@ -9,10 +9,6 @@ import com.example.cashiq.R
 
 class AdviceAdapter(private val adviceList: List<String>) : RecyclerView.Adapter<AdviceAdapter.AdviceViewHolder>() {
 
-    class AdviceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val adviceText: TextView = view.findViewById(R.id.advice_text)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdviceViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_advice, parent, false)
         return AdviceViewHolder(view)
@@ -22,7 +18,9 @@ class AdviceAdapter(private val adviceList: List<String>) : RecyclerView.Adapter
         holder.adviceText.text = adviceList[position]
     }
 
-    override fun getItemCount(): Int {
-        return adviceList.size
+    override fun getItemCount(): Int = adviceList.size
+
+    class AdviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val adviceText: TextView = itemView.findViewById(R.id.advice_text)
     }
 }
