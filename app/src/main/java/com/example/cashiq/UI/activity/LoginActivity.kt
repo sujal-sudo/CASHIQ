@@ -27,6 +27,12 @@ class LoginActivity : AppCompatActivity() {
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
+        // **Check if user is already logged in and redirect to Dashboard**
+        if (isUserLoggedIn()) {
+            startActivity(Intent(this, DashboardActivity::class.java))
+            finish()
+        }
+
         // Login Button Click Listener
         binding.buttonLogin.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
@@ -53,11 +59,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, ForgetPasswordActivity::class.java))
         }
 
-        // Test Dashboard Navigation (Remove this in production)
-        binding.test.setOnClickListener {
-            startActivity(Intent(this, DashboardActivity::class.java))
-        }
-
         // Hide Keyboard when tapping outside
         binding.myConstraintLayout.setOnTouchListener { _, _ ->
             hideKeyboard()
@@ -72,6 +73,7 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    saveUserSession()
                     showToast("Login Successful!")
                     startActivity(Intent(this, DashboardActivity::class.java))
                     finish()
@@ -79,6 +81,38 @@ class LoginActivity : AppCompatActivity() {
                     showError("Login failed: ${task.exception?.message}")
                 }
             }
+    }
+
+    private fun saveUserSession() {
+        val sharedPreferences = getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("isLoggedIn", true)
+        editor.putLong("lastLoginTime", System.currentTimeMillis()) // Save login timestamp
+        editor.apply()
+    }
+
+    private fun isUserLoggedIn(): Boolean {
+        val sharedPreferences = getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        val lastLoginTime = sharedPreferences.getLong("lastLoginTime", 0)
+
+        // Optional: Auto logout after 24 hours (86400000 milliseconds)
+        val sessionTimeout = 86400000L
+        if (isLoggedIn && System.currentTimeMillis() - lastLoginTime < sessionTimeout && auth.currentUser != null) {
+            return true
+        }
+
+        logoutUser() // Auto logout if session expired
+        return false
+    }
+
+    private fun logoutUser() {
+        auth.signOut()
+
+        val sharedPreferences = getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
     }
 
     private fun isConnectedToInternet(): Boolean {
