@@ -10,34 +10,27 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.example.cashiq.UI.activity.DashboardActivity
-import com.example.cashiq.UI.activity.ForgetPasswordActivity
-import com.example.cashiq.UI.activity.SignUpActivity
-import com.example.cashiq.UI.activity.UserData
+import com.example.cashiq.R
 import com.example.cashiq.databinding.ActivityLoginBinding
-import com.google.firebase.database.*
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var firebaseDatabase: FirebaseDatabase
-    private lateinit var databaseReference: DatabaseReference
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setting up the database
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReference = firebaseDatabase.reference.child("users")
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
 
-
-
-
+        // Login Button Click Listener
         binding.buttonLogin.setOnClickListener {
-            val email = binding.editTextEmail.text.toString()
-            val password = binding.editTextPassword.text.toString()
+            val email = binding.editTextEmail.text.toString().trim()
+            val password = binding.editTextPassword.text.toString().trim()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 if (isConnectedToInternet()) {
@@ -46,116 +39,87 @@ class LoginActivity : AppCompatActivity() {
                     showNoInternetError()
                 }
             } else {
-                Toast.makeText(this@LoginActivity, "All fields are mandatory", Toast.LENGTH_SHORT).show()
+                showError("All fields are mandatory")
             }
         }
 
-
-        binding.test.setOnClickListener{
-            startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
-        }
-
-
-
-
-
-
-
-        binding.textViewForgotPassword.setOnClickListener {
-            startActivity(Intent(this@LoginActivity, ForgetPasswordActivity::class.java))
-
-        }
-
+        // Navigation to SignUp
         binding.textViewSignUp.setOnClickListener {
-            startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
-
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
 
-        binding.myConstraintLayout.setOnTouchListener { view, event ->
-            // Hide the keyboard when touched anywhere on ConstraintLayout
-            hideKeyboard(view)
-            true  // Return true to indicate that the touch event was consumed
+        // Forgot Password Navigation
+        binding.textViewForgotPassword.setOnClickListener {
+            startActivity(Intent(this, ForgetPasswordActivity::class.java))
         }
 
-        // Using OnBackPressedDispatcher to handle back press
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // If there's a currently focused view (keyboard is visible), hide the keyboard
-                val currentFocusView = currentFocus
-                if (currentFocusView != null) {
-                    hideKeyboard(currentFocusView)
-                } else {
-                    // If no keyboard is visible, allow the default back press action (app closing)
-                    isEnabled = false  // Disable this callback temporarily
-                    onBackPressedDispatcher.onBackPressed()  // Use onBackPressedDispatcher to call back press behavior
-                }
-            }
-        })
-    }
-
-
-    private fun hideKeyboard(view: View) {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val currentFocusView = currentFocus
-
-        // If there's a currently focused view, hide the keyboard using its window token
-        currentFocusView?.let {
-            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        // Test Dashboard Navigation (Remove this in production)
+        binding.test.setOnClickListener {
+            startActivity(Intent(this, DashboardActivity::class.java))
         }
+
+        // Hide Keyboard when tapping outside
+        binding.myConstraintLayout.setOnTouchListener { _, _ ->
+            hideKeyboard()
+            true
+        }
+
+        // Handle Back Press
+        handleBackPress()
     }
 
     private fun loginUser(email: String, password: String) {
-        databaseReference.orderByChild("email").equalTo(email)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        for (userSnapshot in snapshot.children) {
-                            val userData = userSnapshot.getValue(UserData::class.java)
-                            if (userData != null && userData.email == email && userData.password == password) {
-                                Toast.makeText(
-                                    this@LoginActivity,
-                                    "Login Successful",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
-                                finish()
-                                return
-                            }
-                        }
-                    }
-                    Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    showToast("Login Successful!")
+                    startActivity(Intent(this, DashboardActivity::class.java))
+                    finish()
+                } else {
+                    showError("Login failed: ${task.exception?.message}")
                 }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Database Error: ${databaseError.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            })
+            }
     }
 
-
-
     private fun isConnectedToInternet(): Boolean {
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
         return networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     private fun showNoInternetError() {
-        val builder = android.app.AlertDialog.Builder(this)
-        builder.setTitle("No Internet Connection")
-        builder.setMessage("Please check your internet connection and try again.")
-        builder.setPositiveButton("OK") { dialog, _ ->
-            dialog.dismiss() // Close the dialog
-        }
-        builder.setCancelable(false) // Prevent dismissing the dialog by tapping outside
-        val dialog = builder.create()
-        dialog.show()
+        showError("No Internet Connection. Please check your connection and try again.")
     }
 
+    private fun hideKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = currentFocus
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
+
+    private fun handleBackPress() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentFocus != null) {
+                    hideKeyboard()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showError(message: String) {
+        val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+        toast.view?.setBackgroundResource(R.drawable.error_toast_background) // Custom background
+        toast.show()
+    }
 }
