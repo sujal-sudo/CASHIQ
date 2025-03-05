@@ -34,6 +34,7 @@ class BudgetViewModel : ViewModel() {
 
         budgetRepository.addBudget(budget) { success, message ->
             _operationStatus.postValue(Pair(success, message))
+            if (success) getBudgets(userId) // Refresh list after adding
         }
     }
 
@@ -41,6 +42,13 @@ class BudgetViewModel : ViewModel() {
         budgetRepository.getBudgets(userId) { budgets, success, message ->
             _budgets.postValue(budgets ?: emptyList())
             _operationStatus.postValue(Pair(success, message))
+        }
+    }
+
+    fun deleteBudget(budgetId: String, userId: String) {
+        budgetRepository.deleteBudget(budgetId) { success, message ->
+            _operationStatus.postValue(Pair(success, message))
+            if (success) getBudgets(userId) // Refresh list after deletion
         }
     }
 
