@@ -16,24 +16,25 @@ import com.example.cashiq.UI.CategoryItem
 import com.example.cashiq.adapter.CustomSpinnerAdapter
 import com.example.cashiq.model.ExpenseModel
 import com.example.cashiq.viewmodel.ExpenseViewModel
+import com.example.cashiq.viewmodel.TransactionViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class ExpenseActivity : AppCompatActivity() {
 
     private lateinit var amountEditText: EditText
     private lateinit var categorySpinner: Spinner
     private lateinit var descriptionEditText: EditText
-    private lateinit var repeatSwitch: Switch
     private lateinit var continueButton: Button
     private lateinit var backButton: ImageButton
     private lateinit var constraintLayout: ConstraintLayout
 
     private val expenseViewModel: ExpenseViewModel by viewModels()
+    private val transactionViewModel: TransactionViewModel by viewModels() // ✅ Transaction ViewModel for Balance
+    private var currentBalance: Double = 0.0 // ✅ Stores the user's balance
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,13 +45,13 @@ class ExpenseActivity : AppCompatActivity() {
         setupClickListeners()
         setupCurrencyFormatting()
         observeViewModel()
+        fetchUserBalance() // ✅ Fetch balance when activity starts
     }
 
     private fun initializeViews() {
         amountEditText = findViewById(R.id.total_amount_text)
         categorySpinner = findViewById(R.id.category_spinner)
         descriptionEditText = findViewById(R.id.description)
-        repeatSwitch = findViewById(R.id.repeat_transaction)
         continueButton = findViewById(R.id.continue_button)
         backButton = findViewById(R.id.back_button)
         constraintLayout = findViewById(R.id.myConstraintLayout)
@@ -125,6 +126,11 @@ class ExpenseActivity : AppCompatActivity() {
             return
         }
 
+        if (amount > currentBalance) { // ✅ Check if expense is greater than available balance
+            Toast.makeText(this, "Cannot add expense. Not enough funds.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         if (description.isEmpty()) {
             Toast.makeText(this, "Please enter a description", Toast.LENGTH_SHORT).show()
             return
@@ -160,6 +166,20 @@ class ExpenseActivity : AppCompatActivity() {
         expenseViewModel.operationStatus.observe(this) { (success, message) ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             if (success) finish()
+        }
+    }
+
+    private fun fetchUserBalance() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        transactionViewModel.getAllTransactions(userId)
+
+        transactionViewModel.transactions.observe(this) { transactions ->
+            val totalIncome = transactions.filter { it.type == "income" }.sumOf { it.amount.toDouble() }
+            val totalExpenses = transactions.filter { it.type == "expense" }.sumOf { it.amount.toDouble() }
+            val totalBudget = transactions.filter { it.type == "budget" }.sumOf { it.amount.toDouble() }
+
+            currentBalance = (totalIncome + totalBudget) - totalExpenses
+            Toast.makeText(this, "Current Balance: NPR ${String.format("%.2f", currentBalance)}", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -150,17 +150,6 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/notificationIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/baseline_notifications_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/yellow" />
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="373dp"
