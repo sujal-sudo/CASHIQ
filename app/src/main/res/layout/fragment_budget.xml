@@ -1,54 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF8E1">
+    android:background="#FFF8E1"
+    tools:context=".UI.fragment.BudgetFragment">
 
-    <!-- Header Section -->
+    <!-- Header Text -->
     <TextView
         android:id="@+id/header_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_centerHorizontal="true"
         android:text="Financial Insights"
         android:textColor="#333333"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
 
     <!-- Swipeable Advice Section -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/header_text"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
+        android:layout_height="180dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
         android:clipToPadding="false"
-        android:paddingBottom="16dp" />
+        android:paddingBottom="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_text" />
+
+    <!-- Fragment Container to Switch Between Budget List & Create Budget -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/view_pager"
+        app:layout_constraintBottom_toTopOf="@id/create_budget_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Budget List (Initially Visible) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/budget_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:paddingTop="8dp"/>
+
+    </FrameLayout>
 
     <!-- Create Budget Button -->
     <Button
         android:id="@+id/create_budget_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="32dp"
-        android:layout_alignParentBottom="true"
         android:text="Create a Budget"
-        android:background="@drawable/google_button_background"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/white"
         android:textStyle="bold"
+        android:backgroundTint="#FF9800"
+        android:elevation="6dp"
         android:padding="12dp"
-        android:elevation="4dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
 
-    <!-- Fragment Container for Navigation -->
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

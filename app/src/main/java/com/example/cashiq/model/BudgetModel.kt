@@ -1,10 +1,10 @@
 package com.example.cashiq.model
 
 data class BudgetModel(
-    val id: String = "",             // Primary Key
-    val budgetAmount: Int = 0,        // Total budget amount
-    val startDate: String = "",       // Start date (yyyy-MM-dd)
-    val endDate: String = "",         // End date (yyyy-MM-dd)
-    val budgetCategory: String = "",  // Category of budget
-    val userId: String = ""           // Foreign Key (User ID)
+    val id: String = "",         // Primary Key (Firebase Auto-Generated ID)
+    val userId: String = "",     // Foreign Key (User ID)
+    val category: String = "",   // Budget Category
+    val amount: Int = 0,         // Budget Amount from Slider
+    val startDate: String = "",  // Start Date (yyyy-MM-dd)
+    val endDate: String = ""     // End Date (Auto-calculated: One Month Later)
 )
