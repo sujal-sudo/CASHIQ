@@ -189,6 +189,5 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewForgotPassword" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Remove test button as it's likely not meant for production -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
