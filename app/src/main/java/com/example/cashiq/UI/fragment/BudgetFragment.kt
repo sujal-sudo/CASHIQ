@@ -1,10 +1,12 @@
 package com.example.cashiq.UI.fragment
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,12 +21,11 @@ class BudgetFragment : Fragment() {
 
     private val budgetViewModel: BudgetViewModel by viewModels()
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
-    private var isCreatingBudget = false // Keeps track of whether Create Budget Fragment is open
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view = inflater.inflate(R.layout.fragment_budget, container, false)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.budget_list)
@@ -33,17 +34,23 @@ class BudgetFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Fetch Budgets
+        // ✅ Load Budgets
         loadBudgets()
 
-        // Observe Budget Data & Update RecyclerView
         budgetViewModel.budgets.observe(viewLifecycleOwner, Observer { budgets ->
-            recyclerView.adapter = BudgetAdapter(budgets)
+            recyclerView.adapter = BudgetAdapter(budgets) { budgetId ->
+                showDeleteConfirmationDialog(budgetId)
+            }
         })
 
-        // ✅ Button Click Listener to Open Create Budget Fragment
+        // ✅ Open CreateBudgetFragment on Button Click
         createBudgetButton.setOnClickListener {
-            openCreateBudgetFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, CreateBudgetFragment.newInstance {
+                    refreshBudgetList() // ✅ Refresh after adding
+                })
+                .addToBackStack(null)
+                .commit()
         }
 
         return view
@@ -51,34 +58,32 @@ class BudgetFragment : Fragment() {
 
     // ✅ Load Budget Data from Firebase
     private fun loadBudgets() {
-        if (userId != null) {
-            budgetViewModel.getBudgets(userId)
+        userId?.let { budgetViewModel.getBudgets(it) }
+    }
+
+    // ✅ Refresh Budget List after Adding/Deleting
+    private fun refreshBudgetList() {
+        userId?.let { budgetViewModel.getBudgets(it) }
+    }
+
+    // ✅ Show Confirmation Dialog Before Deleting a Budget
+    private fun showDeleteConfirmationDialog(budgetId: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete Budget")
+        builder.setMessage("Are you sure you want to delete this budget?")
+
+        builder.setPositiveButton("Delete") { _, _ ->
+            userId?.let {
+                budgetViewModel.deleteBudget(budgetId, it)
+                Toast.makeText(requireContext(), "Budget deleted successfully", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
-// ✅ Opens CreateBudgetFragment & Hides Budget List
-    private fun openCreateBudgetFragment() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, CreateBudgetFragment.newInstance {
-                closeCreateBudgetFragment()  // ✅ Callback when budget is added
-            })
-            .addToBackStack(null)
-            .commit()
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss() // Close dialog without deleting
+        }
 
-        view?.findViewById<RecyclerView>(R.id.budget_list)?.visibility = View.GONE // Hide RecyclerView
-        view?.findViewById<View>(R.id.fragment_container)?.visibility = View.VISIBLE // Show Fragment Container
-    }
-
-
-    // ✅ Closes CreateBudgetFragment After Budget is Added & Refreshes List
-    private fun closeCreateBudgetFragment() {
-        parentFragmentManager.popBackStack()  // Close fragment
-
-        // Show RecyclerView again
-        view?.findViewById<RecyclerView>(R.id.budget_list)?.visibility = View.VISIBLE
-        view?.findViewById<View>(R.id.fragment_container)?.visibility = View.GONE
-
-        // Refresh Budget List
-        budgetViewModel.getBudgets(userId ?: "")
+        val dialog = builder.create()
+        dialog.show()
     }
 }

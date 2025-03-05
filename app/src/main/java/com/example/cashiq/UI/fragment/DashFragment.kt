@@ -91,10 +91,11 @@ class DashFragment : Fragment() {
         // Connect TabLayout with ViewPager2
         TabLayoutMediator(binding.tabLayout, binding.pagerDash) { tab, position ->
             tab.text = when (position) {
-                0 -> "Today"
-                1 -> "Week"
-                2 -> "Month"
-                3 -> "Year"
+                0 -> "All"
+                1 -> "Today"
+                2 -> "Week"
+                3 -> "Month"
+                4 -> "Year"
                 else -> null
             }
         }.attach()
