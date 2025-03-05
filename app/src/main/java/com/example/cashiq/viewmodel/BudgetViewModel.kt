@@ -1,61 +1,68 @@
 package com.example.cashiq.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.cashiq.model.BudgetModel
 import com.example.cashiq.repository.BudgetRepository
+import com.example.cashiq.repository.BudgetRepositoryImpl
+import java.text.SimpleDateFormat
+import java.util.*
 
-class BudgetViewModel(private val repo: BudgetRepository) {
+class BudgetViewModel : ViewModel() {
 
-    // Add Budget
-    fun addBudget(budget: BudgetModel, callback: (Boolean, String) -> Unit) {
-        repo.addBudget(budget, callback)
-    }
+    private val budgetRepository: BudgetRepository = BudgetRepositoryImpl()
 
-    // Update Budget
-    fun updateBudget(budgetId: String, data: MutableMap<String, Any>, callback: (Boolean, String) -> Unit) {
-        repo.updateBudget(budgetId, data, callback)
-    }
+    private val _budgets = MutableLiveData<List<BudgetModel>>()
+    val budgets: LiveData<List<BudgetModel>> get() = _budgets
 
-    // Delete Budget
-    fun deleteBudget(budgetId: String, callback: (Boolean, String) -> Unit) {
-        repo.deleteBudget(budgetId, callback)
-    }
+    private val _operationStatus = MutableLiveData<Pair<Boolean, String>>()
+    val operationStatus: LiveData<Pair<Boolean, String>> get() = _operationStatus
 
-    // LiveData for a single budget
-    private var _budget = MutableLiveData<BudgetModel?>()
-    var budget = MutableLiveData<BudgetModel?>()
-        get() = _budget
+    fun addBudget(category: String, amount: Int, userId: String) {
+        val startDate = getCurrentDate()
+        val endDate = getOneMonthLater(startDate)
 
-    // LiveData for all budgets
-    private var _allBudgets = MutableLiveData<List<BudgetModel>>()
-    var allBudgets = MutableLiveData<List<BudgetModel>>()
-        get() = _allBudgets
+        val budget = BudgetModel(
+            id = "",
+            userId = userId,
+            category = category,
+            amount = amount,
+            startDate = startDate,
+            endDate = endDate
+        )
 
-    // LiveData for loading state
-    private var _loading = MutableLiveData<Boolean>()
-    var loading = MutableLiveData<Boolean>()
-        get() = _loading
-
-    // Fetch a single budget by ID
-    fun getBudgetById(budgetId: String) {
-        repo.getBudgetById(budgetId) { budgetModel, success, message ->
-            if (success) {
-                _budget.value = budgetModel
-            }
+        budgetRepository.addBudget(budget) { success, message ->
+            _operationStatus.postValue(Pair(success, message))
+            if (success) getBudgets(userId) // Refresh list after adding
         }
     }
 
-    // Fetch all budgets
-    fun getAllBudgets() {
-        _loading.value = true
-        repo.getAllBudgets { budgets, success, message ->
-            if (success) {
-                _allBudgets.value = budgets ?: emptyList() // Ensure non-null list
-                _loading.value = false
-            } else {
-                _allBudgets.value = emptyList() // Handle failure by providing empty list
-                _loading.value = false
-            }
+    fun getBudgets(userId: String) {
+        budgetRepository.getBudgets(userId) { budgets, success, message ->
+            _budgets.postValue(budgets ?: emptyList())
+            _operationStatus.postValue(Pair(success, message))
         }
+    }
+
+    fun deleteBudget(budgetId: String, userId: String) {
+        budgetRepository.deleteBudget(budgetId) { success, message ->
+            _operationStatus.postValue(Pair(success, message))
+            if (success) getBudgets(userId) // Refresh list after deletion
+        }
+    }
+
+    private fun getCurrentDate(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(Date())
+    }
+
+    private fun getOneMonthLater(startDate: String): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = sdf.parse(startDate)
+        val calendar = Calendar.getInstance()
+        calendar.time = date!!
+        calendar.add(Calendar.MONTH, 1) // Add 1 month
+        return sdf.format(calendar.time)
     }
 }

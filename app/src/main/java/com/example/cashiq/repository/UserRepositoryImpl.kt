@@ -1,87 +1,67 @@
 package com.example.cashiq.repository
 
 import com.example.cashiq.model.UserModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class UserRepositoryImpl : UserRepository {
 
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val ref: DatabaseReference = database.reference.child("users")
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("users")
 
-    override fun addUser(user: UserModel, callback: (Boolean, String) -> Unit) {
-        val id = ref.push().key.toString()
-        val userWithId = user.copy(id = id)
-        ref.child(id).setValue(userWithId).addOnCompleteListener {
-            if (it.isSuccessful) {
-                callback(true, "User added successfully.")
+    override fun registerUser(user: UserModel, callback: (Boolean, String) -> Unit) {
+        auth.createUserWithEmailAndPassword(user.email, user.password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid ?: ""
+                val newUser = user.copy(id = userId)
+
+                database.child(userId).setValue(newUser).addOnCompleteListener {
+                    if (it.isSuccessful) callback(true, "User registered successfully.")
+                    else callback(false, it.exception?.message ?: "Database error.")
+                }
             } else {
-                callback(false, "${it.exception?.message}")
+                callback(false, task.exception?.message ?: "Registration failed.")
             }
         }
     }
 
-    override fun updateUser(
-        userId: String,
-        data: MutableMap<String, Any>,
-        callback: (Boolean, String) -> Unit
-    ) {
-        ref.child(userId).updateChildren(data).addOnCompleteListener {
-            if (it.isSuccessful) {
-                callback(true, "User updated successfully.")
-            } else {
-                callback(false, "${it.exception?.message}")
-            }
+    override fun loginUser(email: String, password: String, callback: (Boolean, String) -> Unit) {
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) callback(true, "Login successful.")
+            else callback(false, task.exception?.message ?: "Login failed.")
+        }
+    }
+
+    override fun updateUser(userId: String, data: Map<String, Any>, callback: (Boolean, String) -> Unit) {
+        database.child(userId).updateChildren(data).addOnCompleteListener {
+            if (it.isSuccessful) callback(true, "User updated successfully.")
+            else callback(false, it.exception?.message ?: "Update failed.")
         }
     }
 
     override fun deleteUser(userId: String, callback: (Boolean, String) -> Unit) {
-        ref.child(userId).removeValue().addOnCompleteListener {
+        database.child(userId).removeValue().addOnCompleteListener {
             if (it.isSuccessful) {
-                callback(true, "User deleted successfully.")
+                auth.currentUser?.delete()?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) callback(true, "User deleted successfully.")
+                    else callback(false, task.exception?.message ?: "Account deletion failed.")
+                }
             } else {
-                callback(false, "${it.exception?.message}")
+                callback(false, it.exception?.message ?: "Database deletion failed.")
             }
         }
     }
 
-    override fun getUserById(
-        userId: String,
-        callback: (UserModel?, Boolean, String) -> Unit
-    ) {
-        ref.child(userId).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val user = snapshot.getValue(UserModel::class.java)
-                    callback(user, true, "User fetched successfully.")
-                } else {
-                    callback(null, false, "User not found.")
-                }
+    override fun getUserById(userId: String, callback: (UserModel?, Boolean, String) -> Unit) {
+        database.child(userId).get().addOnSuccessListener {
+            if (it.exists()) {
+                val user = it.getValue(UserModel::class.java)
+                callback(user, true, "User fetched successfully.")
+            } else {
+                callback(null, false, "User not found.")
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(null, false, error.message)
-            }
-        })
-    }
-
-    override fun getAllUsers(callback: (List<UserModel>?, Boolean, String) -> Unit) {
-        ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val users = mutableListOf<UserModel>()
-                    for (eachData in snapshot.children) {
-                        val user = eachData.getValue(UserModel::class.java)
-                        user?.let { users.add(it) }
-                    }
-                    callback(users, true, "Users fetched successfully.")
-                } else {
-                    callback(null, false, "No users found.")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(null, false, error.message)
-            }
-        })
+        }.addOnFailureListener {
+            callback(null, false, it.message ?: "Error fetching user.")
+        }
     }
 }

@@ -12,6 +12,7 @@ class DashPagerAdapter(fragment: Fragment, context: Context) : FragmentStateAdap
         // Check internet connection and set the fragment list accordingly
         fragmentList = if (isNetworkAvailable(context)) {
             listOf(
+                AllFragment(),
                 TodayFragment(),
                 WeekFragment(),
                 MonthFragment(),
