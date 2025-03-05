@@ -14,11 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
 import com.example.cashiq.databinding.ActivitySignUpBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -28,7 +23,6 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var databaseReference: DatabaseReference
     private lateinit var auth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var binding: ActivitySignUpBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,11 +35,6 @@ class SignUpActivity : AppCompatActivity() {
         databaseReference = firebaseDatabase.reference.child("users")
         auth = FirebaseAuth.getInstance()
 
-        // Google Sign-In Configuration
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         // Sign-Up Button Click
         binding.signupButton.setOnClickListener {
@@ -62,11 +51,6 @@ class SignUpActivity : AppCompatActivity() {
             } else {
                 showError("All fields are mandatory!")
             }
-        }
-
-        // Google Sign-Up Button Click
-        binding.googleSignupButton.setOnClickListener {
-            signInWithGoogle()
         }
 
         // Login Navigation Click
@@ -105,31 +89,8 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    // Google Sign-In Handling
-    private val signInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        handleSignInResult(task)
-    }
 
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        signInLauncher.launch(signInIntent)
-    }
 
-    private fun handleSignInResult(task: Task<GoogleSignInAccount>) {
-        try {
-            val account = task.getResult(Exception::class.java)
-            account?.let {
-                Log.d("GoogleSignIn", "Signed in as: ${it.email}")
-                showToast("Signed in as: ${it.email}")
-                // Handle successful Google sign-in logic here
-            }
-        } catch (e: Exception) {
-            showError("Google sign-in failed!")
-        }
-    }
 
     // Internet Connection Check
     private fun isConnectedToInternet(): Boolean {

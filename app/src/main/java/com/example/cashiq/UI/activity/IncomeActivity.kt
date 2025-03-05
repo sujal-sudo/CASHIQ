@@ -49,7 +49,6 @@ class IncomeActivity : AppCompatActivity() {
     private fun initializeViews() {
         categorySpinner = findViewById(R.id.category_spinner)
         descriptionEditText = findViewById(R.id.description)
-        repeatSwitch = findViewById(R.id.repeat_transaction)
         continueButton = findViewById(R.id.continue_button)
         backButton = findViewById(R.id.backButton)
         amountEditText = findViewById(R.id.amountText)

@@ -54,10 +54,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, SignUpActivity::class.java))
         }
 
-        // Forgot Password Navigation
-        binding.textViewForgotPassword.setOnClickListener {
-            startActivity(Intent(this, ForgetPasswordActivity::class.java))
-        }
 
         // Hide Keyboard when tapping outside
         binding.myConstraintLayout.setOnTouchListener { _, _ ->
