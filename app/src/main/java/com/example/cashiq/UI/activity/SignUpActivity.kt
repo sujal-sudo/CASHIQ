@@ -2,163 +2,145 @@ package com.example.cashiq.UI.activity
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cashiq.R
-import com.example.cashiq.databinding.ActivityLoginBinding
 import com.example.cashiq.databinding.ActivitySignUpBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.tasks.Task
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
 class SignUpActivity : AppCompatActivity() {
 
-
-    // Firebase connection
+    // Firebase Connection
     private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var databaseReference: DatabaseReference
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivitySignUpBinding
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding=ActivitySignUpBinding.inflate(layoutInflater)
+        binding = ActivitySignUpBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-//        setContentView(R.layout.activity_sign_up) // Ensure this layout exists
-        setContentView(binding.root) // Ensure this layout exists
-
-
-        //Firebase and Database
-        firebaseDatabase = FirebaseDatabase.getInstance()// initializing database
+        // Firebase Initialization
+        firebaseDatabase = FirebaseDatabase.getInstance()
         databaseReference = firebaseDatabase.reference.child("users")
-        // here it will use database through databaserefrecnce
+        auth = FirebaseAuth.getInstance()
+
+
+        // Sign-Up Button Click
         binding.signupButton.setOnClickListener {
-            val username = binding.signupName.text.toString()
-            val email = binding.signupEmail.text.toString()
-            val password = binding.signupPassword.text.toString()
+            val username = binding.signupName.text.toString().trim()
+            val email = binding.signupEmail.text.toString().trim()
+            val password = binding.signupPassword.text.toString().trim()
 
             if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                signupUser(username, email, password)
+                if (isConnectedToInternet()) {
+                    signupUser(username, email, password)
+                } else {
+                    showNoInternetError()
+                }
             } else {
-                Toast.makeText(this@SignUpActivity, "All fields are mandatory ", Toast.LENGTH_SHORT)
-                    .show()
+                showError("All fields are mandatory!")
             }
-
         }
+
+        // Login Navigation Click
         binding.loginTextview.setOnClickListener {
-            startActivity(Intent(this@SignUpActivity, LoginActivity::class.java))
-            finish()
+            navigateToLogin()
         }
 
-        // Initialize UI elements
-        val signupButton: Button = findViewById(R.id.signup_button)
-        val googleSignupButton: Button = findViewById(R.id.google_signup_button)
-        val termsCheckbox: CheckBox = findViewById(R.id.terms_checkbox)
-        val emailEditText: EditText = findViewById(R.id.signup_email)
-        val nameEditText: EditText = findViewById(R.id.signup_name)
-        val passwordEditText: EditText = findViewById(R.id.signup_password)
-        val loginTextview: TextView = findViewById(R.id.loginTextview)
-
-        // Configure Google Sign-In
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-
-
-        // Set click listener for the Login TextView
-        loginTextview.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Set click listener for the Google Sign Up button
-        googleSignupButton.setOnClickListener {
-            signInWithGoogle()
-        }
-
-        // Set click listener for the Constraint layout for hiding keyboard
+        // Hide Keyboard on Background Click
         binding.myConstraintLayout.setOnTouchListener { _, _ ->
-            hideKeyboardAndClearFocus()
-            true // Consume the touch event
+            hideKeyboard()
+            true
+        }
+
+        // Back Press Handling
+        handleBackPress()
+    }
+
+    // Sign-Up Function
+    private fun signupUser(username: String, email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid ?: ""
+                val userData = UserData(userId, username, email, password)
+
+                databaseReference.child(userId).setValue(userData).addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        showToast("Signup Successful!")
+                        navigateToLogin()
+                    } else {
+                        showError(it.exception?.message ?: "Database error")
+                    }
+                }
+            } else {
+                showError(task.exception?.message ?: "Signup failed!")
+            }
         }
     }
-    // This is the database Fucntion that checks the required fucntion to run the database
-    private fun signupUser(username: String, password: String, email: String){
-        databaseReference.orderByChild("username").equalTo(username).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) { // snapshot is the object that specifies a particular location of a data
-                if (!snapshot.exists()){
-                    val id = databaseReference.push().key
-                    val userData = UserData(id,username, email, password)
-                    databaseReference.child(id!!).setValue(userData)
-                    Toast.makeText(this@SignUpActivity, "Signup Successful" , Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@SignUpActivity,LoginActivity::class.java))
-                    finish()
-                } else{
-                    Toast.makeText(this@SignUpActivity, "User Already Exists" , Toast.LENGTH_SHORT).show()
+
+
+
+
+    // Internet Connection Check
+    private fun isConnectedToInternet(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        return networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private fun showNoInternetError() {
+        showError("No Internet Connection. Please check your connection and try again.")
+    }
+
+    // Hide Keyboard Function
+    private fun hideKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = currentFocus
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
+
+    // Back Press Handling
+    private fun handleBackPress() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentFocus != null) {
+                    hideKeyboard()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
                 }
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Toast.makeText(this@SignUpActivity, "Database Error: ${databaseError.message}" , Toast.LENGTH_SHORT).show()
-
-
             }
         })
     }
 
-    private val signInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        handleSignInResult(task)
+    // Navigation to Login
+    private fun navigateToLogin() {
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
     }
 
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        signInLauncher.launch(signInIntent)
+    // Utility Functions
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun handleSignInResult(task: Task<GoogleSignInAccount>) {
-        try {
-            val account = task.getResult(Exception::class.java)
-            account?.let {
-                Log.d("GoogleSignIn", "Sign-in successful. Name: ${it.displayName}, Email: ${it.email}")
-                Toast.makeText(this, "Signed in as: ${it.email}", Toast.LENGTH_SHORT).show()
-                // Add logic for successful sign-in (e.g., navigate to the main activity)
-            }
-        } catch (e: Exception) {
-            Log.e("GoogleSignIn", "Sign-in failed", e)
-            Toast.makeText(this, "Sign-in failed.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun hideKeyboardAndClearFocus() {
-        // Hide the keyboard
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = currentFocus ?: View(this)
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-
-        // Clear focus from the currently focused view
-        currentFocus?.clearFocus()
-
-        //  set focus to the layout
-        binding.myConstraintLayout.requestFocus()
+    private fun showError(message: String) {
+        val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+        toast.view?.setBackgroundResource(R.drawable.error_toast_background) // Custom background
+        toast.show()
     }
 }

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
+    app:cardElevation="4dp"
     android:background="@color/gray_light_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,17 +14,17 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
+        <!-- Transaction Icon (Dynamically Set in Adapter) -->
         <ImageView
             android:id="@+id/transactionIcon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/circle_background"
             android:padding="8dp"
-            android:src="@drawable/shoppingcart"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/yellow" />
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Transaction Title (Category) -->
         <TextView
             android:id="@+id/transactionTitle"
             android:layout_width="0dp"
@@ -33,10 +33,12 @@
             android:layout_marginEnd="8dp"
             android:textColor="@color/black"
             android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/transactionIcon"
             app:layout_constraintTop_toTopOf="@id/transactionIcon"
             app:layout_constraintEnd_toStartOf="@id/transactionAmount" />
 
+        <!-- Transaction Description (Note) -->
         <TextView
             android:id="@+id/transactionDescription"
             android:layout_width="0dp"
@@ -49,6 +51,7 @@
             app:layout_constraintTop_toBottomOf="@id/transactionTitle"
             app:layout_constraintEnd_toStartOf="@id/transactionTime" />
 
+        <!-- Transaction Amount -->
         <TextView
             android:id="@+id/transactionAmount"
             android:layout_width="wrap_content"
@@ -58,6 +61,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/transactionIcon" />
 
+        <!-- Transaction Date/Time -->
         <TextView
             android:id="@+id/transactionTime"
             android:layout_width="wrap_content"

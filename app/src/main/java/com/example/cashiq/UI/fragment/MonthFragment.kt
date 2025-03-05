@@ -1,60 +1,118 @@
 package com.example.cashiq.UI.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cashiq.R
+import com.example.cashiq.adapter.TransactionAdapter
+import com.example.cashiq.viewmodel.TransactionViewModel
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MonthFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MonthFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val transactionViewModel: TransactionViewModel by viewModels()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid
+    private var isCurrentMonth = true // ✅ Toggle between Current & Last Month
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_month, container, false)
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_month, container, false)
+
+        val recyclerView: RecyclerView = view.findViewById(R.id.month_recycler)
+        val loadingIndicator: ImageView = view.findViewById(R.id.loadingIndicator)
+        val noTransactionsText: TextView = view.findViewById(R.id.noTransactionsText)
+        val toggleButton: ToggleButton = view.findViewById(R.id.month_toggle_button) // ✅ Toggle Button
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // ✅ Show loading indicator before fetching data
+        loadingIndicator.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        noTransactionsText.visibility = View.GONE
+
+        // ✅ Load Transactions for the Current Month
+        loadMonthTransactions(loadingIndicator, recyclerView, noTransactionsText, isCurrentMonth)
+
+        // ✅ Handle Toggle Button Click
+        toggleButton.setOnCheckedChangeListener { _, isChecked ->
+            isCurrentMonth = !isChecked
+            loadMonthTransactions(loadingIndicator, recyclerView, noTransactionsText, isCurrentMonth)
+        }
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MonthFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MonthFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    // ✅ Fetch Transactions for Selected Month
+    private fun loadMonthTransactions(
+        loadingIndicator: ImageView,
+        recyclerView: RecyclerView,
+        noTransactionsText: TextView,
+        isCurrent: Boolean
+    ) {
+        userId?.let {
+            transactionViewModel.getAllTransactions(it)
+
+            transactionViewModel.transactions.observe(viewLifecycleOwner, Observer { transactions ->
+                Log.d("MonthFragment", "Total Transactions Fetched: ${transactions.size}")
+
+                val selectedMonth = if (isCurrent) getCurrentMonth() else getLastMonth()
+                Log.d("MonthFragment", "Selected Month: $selectedMonth")
+
+                val monthTransactions = transactions.filter { transaction ->
+                    val transactionMonthOnly = extractMonth(transaction.date)
+                    Log.d("MonthFragment", "Transaction Month: $transactionMonthOnly")
+                    transactionMonthOnly == selectedMonth
                 }
-            }
+
+                if (monthTransactions.isNotEmpty()) {
+                    val adapter = TransactionAdapter(monthTransactions)
+                    recyclerView.adapter = adapter
+                    adapter.notifyDataSetChanged()
+
+                    // ✅ Hide Loading & Show Data
+                    loadingIndicator.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                    noTransactionsText.visibility = View.GONE
+                    Log.d("MonthFragment", "Transactions in selected month: ${monthTransactions.size}")
+                } else {
+                    // ✅ Show "No Transactions This Month" Message
+                    loadingIndicator.visibility = View.GONE
+                    recyclerView.visibility = View.GONE
+                    noTransactionsText.visibility = View.VISIBLE
+                    Log.d("MonthFragment", "No transactions found for selected month.")
+                }
+            })
+        }
+    }
+
+    // ✅ Get Current Month in "yyyy-MM" format
+    private fun getCurrentMonth(): String {
+        val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        return sdf.format(Date())
+    }
+
+    // ✅ Get Last Month in "yyyy-MM" format
+    private fun getLastMonth(): String {
+        val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MONTH, -1) // Subtract 1 month
+        return sdf.format(calendar.time)
+    }
+
+    // ✅ Extract "yyyy-MM" from a full date-time string
+    private fun extractMonth(fullDate: String): String {
+        return fullDate.substring(0, 7) // Extracts "yyyy-MM" from "yyyy-MM-dd HH:mm:ss"
     }
 }

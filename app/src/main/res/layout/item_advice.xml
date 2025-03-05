@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#FFFFFF"
     android:elevation="4dp"
@@ -11,13 +11,13 @@
     android:gravity="center"
     android:layout_gravity="center">
 
-    <TextView
-        android:id="@+id/advice_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Financial advice goes here"
-        android:textSize="16sp"
-        android:textColor="#333333"
-        android:textAlignment="center"
-        android:lineSpacingExtra="4dp" />
-</LinearLayout>
+<TextView
+android:id="@+id/advice_text"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Financial advice goes here"
+android:textSize="16sp"
+android:textColor="#333333"
+android:textAlignment="center"
+android:lineSpacingExtra="4dp" />
+    </LinearLayout>

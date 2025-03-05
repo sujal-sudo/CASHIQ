@@ -1,56 +1,99 @@
 package com.example.cashiq.UI.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cashiq.R
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+import com.example.cashiq.adapter.TransactionAdapter
+import com.example.cashiq.viewmodel.TransactionViewModel
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.*
 
-/**
- * A simple [Fragment] subclass.
- * Use the [TodayFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TodayFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private val transactionViewModel: TransactionViewModel by viewModels()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_today, container, false)
+
+        val recyclerView: RecyclerView = view.findViewById(R.id.today_recycler)
+        val loadingIndicator: ImageView = view.findViewById(R.id.loadingIndicator)
+        val noTransactionsText: TextView = view.findViewById(R.id.noTransactionsText)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // ✅ Show Loading Indicator Before Fetching Data
+        loadingIndicator.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        noTransactionsText.visibility = View.GONE
+
+        loadTodayTransactions(loadingIndicator, recyclerView, noTransactionsText)
+
+        return view
+    }
+
+    // ✅ Fetch Today's Transactions & Fix Date Filtering
+    private fun loadTodayTransactions(loadingIndicator: ImageView, recyclerView: RecyclerView, noTransactionsText: TextView) {
+        userId?.let {
+            transactionViewModel.getAllTransactions(it)
+
+            transactionViewModel.transactions.observe(viewLifecycleOwner, Observer { transactions ->
+                Log.d("TodayFragment", "Total Transactions Fetched: ${transactions.size}")
+
+                val today = getCurrentDate()
+                Log.d("TodayFragment", "Today's Date: $today")
+
+                val todayTransactions = transactions.filter { transaction ->
+                    val transactionDateOnly = extractDate(transaction.date)
+                    Log.d("TodayFragment", "Transaction Date (Extracted): $transactionDateOnly")
+                    Log.d("TodayFragment", "Comparison: ${transactionDateOnly == today}") // ✅ Log this for debugging
+                    transactionDateOnly == today
+                }
+
+                if (todayTransactions.isNotEmpty()) {
+                    val adapter = TransactionAdapter(todayTransactions)
+                    recyclerView.adapter = adapter
+                    adapter.notifyDataSetChanged() // ✅ Ensure data refresh
+
+                    // ✅ Hide Loading & Show Data
+                    loadingIndicator.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                    noTransactionsText.visibility = View.GONE
+                    Log.d("TodayFragment", "Transactions displayed: ${todayTransactions.size}")
+                } else {
+                    // ✅ Show "No Transactions Today" Message
+                    loadingIndicator.visibility = View.GONE
+                    recyclerView.visibility = View.GONE
+                    noTransactionsText.visibility = View.VISIBLE
+                    Log.d("TodayFragment", "No transactions found for today.")
+                }
+            })
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_today, container, false)
+
+    // ✅ Get Current Date in "yyyy-MM-dd" format
+    private fun getCurrentDate(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(Date())
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment TodayFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic fun newInstance(param1: String, param2: String) =
-                TodayFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
-                }
+    // ✅ Extract only "yyyy-MM-dd" from a full date-time string
+    private fun extractDate(fullDate: String): String {
+        return fullDate.substring(0, 10) // Extracts "yyyy-MM-dd" from "yyyy-MM-dd HH:mm:ss"
     }
 }
