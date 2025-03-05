@@ -1,53 +1,84 @@
 package com.example.cashiq.UI.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cashiq.R
-import com.example.cashiq.adapter.AdviceAdapter
+import com.example.cashiq.adapter.BudgetAdapter
+import com.example.cashiq.viewmodel.BudgetViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 class BudgetFragment : Fragment() {
+
+    private val budgetViewModel: BudgetViewModel by viewModels()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid
+    private var isCreatingBudget = false // Keeps track of whether Create Budget Fragment is open
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        // Inflate the layout for this fragment
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_budget, container, false)
 
-        // Initialize views
+        val recyclerView: RecyclerView = view.findViewById(R.id.budget_list)
         val createBudgetButton: Button = view.findViewById(R.id.create_budget_button)
-        val viewPager: ViewPager2 = view.findViewById(R.id.view_pager)
+        val fragmentContainer: View = view.findViewById(R.id.fragment_container)
 
-        // Ensure ViewPager2 scrolls properly
-        viewPager.offscreenPageLimit = 1
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Set up swipeable financial advice cards (Shuffled List)
-        val adviceList = mutableListOf(
-            "Track your daily expenses to identify spending patterns.",
-            "Save at least 20% of your income for emergencies.",
-            "Avoid unnecessary subscriptions that you don’t use.",
-            "Plan your purchases and avoid impulse buying.",
-            "Invest in assets that generate passive income."
-        ).shuffled() // Randomizing the order
+        // Fetch Budgets
+        loadBudgets()
 
-        val adapter = AdviceAdapter(adviceList)
-        viewPager.adapter = adapter
+        // Observe Budget Data & Update RecyclerView
+        budgetViewModel.budgets.observe(viewLifecycleOwner, Observer { budgets ->
+            recyclerView.adapter = BudgetAdapter(budgets)
+        })
 
-        // Ensure ViewPager2 starts from the first position
-        viewPager.setCurrentItem(0, false)
-
-        // Button click listener to navigate to the budget creation screen
+        // ✅ Button Click Listener to Open Create Budget Fragment
         createBudgetButton.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, CreateBudgetFragment())
-                .addToBackStack(null)
-                .commit()
+            openCreateBudgetFragment()
         }
 
         return view
+    }
+
+    // ✅ Load Budget Data from Firebase
+    private fun loadBudgets() {
+        if (userId != null) {
+            budgetViewModel.getBudgets(userId)
+        }
+    }
+
+// ✅ Opens CreateBudgetFragment & Hides Budget List
+    private fun openCreateBudgetFragment() {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, CreateBudgetFragment.newInstance {
+                closeCreateBudgetFragment()  // ✅ Callback when budget is added
+            })
+            .addToBackStack(null)
+            .commit()
+
+        view?.findViewById<RecyclerView>(R.id.budget_list)?.visibility = View.GONE // Hide RecyclerView
+        view?.findViewById<View>(R.id.fragment_container)?.visibility = View.VISIBLE // Show Fragment Container
+    }
+
+
+    // ✅ Closes CreateBudgetFragment After Budget is Added & Refreshes List
+    private fun closeCreateBudgetFragment() {
+        parentFragmentManager.popBackStack()  // Close fragment
+
+        // Show RecyclerView again
+        view?.findViewById<RecyclerView>(R.id.budget_list)?.visibility = View.VISIBLE
+        view?.findViewById<View>(R.id.fragment_container)?.visibility = View.GONE
+
+        // Refresh Budget List
+        budgetViewModel.getBudgets(userId ?: "")
     }
 }
