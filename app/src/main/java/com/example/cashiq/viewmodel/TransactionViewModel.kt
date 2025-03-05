@@ -1,58 +1,56 @@
 package com.example.cashiq.viewmodel
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.cashiq.model.TransactionModel
-import com.example.cashiq.repository.TransactionRepository
+import com.example.cashiq.repository.ExpenseRepositoryImpl
+import com.example.cashiq.repository.IncomeRepositoryImpl
 
-class TransactionViewModel(private val repo: TransactionRepository) : ViewModel() {
+class TransactionViewModel : ViewModel() {
 
-    // LiveData for a single transaction
-    private var _transaction = MutableLiveData<TransactionModel?>()
-    val transaction: MutableLiveData<TransactionModel?> get() = _transaction
+    private val incomeRepository = IncomeRepositoryImpl()
+    private val expenseRepository = ExpenseRepositoryImpl()
 
-    // LiveData for all transactions
-    private var _allTransactions = MutableLiveData<List<TransactionModel>>()
-    val allTransactions: MutableLiveData<List<TransactionModel>> get() = _allTransactions
+    private val _transactions = MutableLiveData<List<TransactionModel>>()
+    val transactions: LiveData<List<TransactionModel>> get() = _transactions
 
-    // LiveData for loading state
-    private var _loading = MutableLiveData<Boolean>()
-    val loading: MutableLiveData<Boolean> get() = _loading
+    fun getAllTransactions(userId: String) {
+        Log.d("TransactionViewModel", "Fetching transactions for user: $userId")
 
-    // Add a new transaction
-    fun addTransaction(transactionModel: TransactionModel, callback: (Boolean, String) -> Unit) {
-        repo.addTransaction(transactionModel, callback)
-    }
+        val allTransactions = mutableListOf<TransactionModel>()
 
-    // Update a transaction
-    fun updateTransaction(transactionId: String, data: MutableMap<String, Any>, callback: (Boolean, String) -> Unit) {
-        repo.updateTransaction(transactionId, data, callback)
-    }
-
-    // Delete a transaction
-    fun deleteTransaction(transactionId: String, callback: (Boolean, String) -> Unit) {
-        repo.deleteTransaction(transactionId, callback)
-    }
-
-    // Fetch a single transaction
-    fun getTransactionById(transactionId: String) {
-        repo.getTransactionById(transactionId) { transactionModel, success, message ->
-            if (success) {
-                _transaction.value = transactionModel
-            }
-        }
-    }
-
-    // Fetch all transactions
-    fun getAllTransactions() {
-        _loading.value = true
-        repo.getAllTransactions { transactions, success, message ->
-            if (success) {
-                _allTransactions.value = transactions ?: emptyList()
+        incomeRepository.getAllIncomes(userId) { incomeList, success, message ->
+            if (success && incomeList != null) {
+                val incomeTransactions = incomeList.map { it.toTransactionModel("income") }
+                allTransactions.addAll(incomeTransactions)
+                Log.d("TransactionViewModel", "Fetched ${incomeTransactions.size} incomes")
             } else {
-                _allTransactions.value = emptyList()
+                Log.e("TransactionViewModel", "Failed to fetch incomes: $message")
             }
-            _loading.value = false
+
+            expenseRepository.getAllExpenses(userId) { expenseList, success, message ->
+                if (success && expenseList != null) {
+                    val expenseTransactions = expenseList.map { it.toTransactionModel("expense") }
+                    allTransactions.addAll(expenseTransactions)
+                    Log.d("TransactionViewModel", "Fetched ${expenseTransactions.size} expenses")
+                } else {
+                    Log.e("TransactionViewModel", "Failed to fetch expenses: $message")
+                }
+
+                // ✅ Sort transactions by date descending
+                allTransactions.sortByDescending { it.date }
+                _transactions.postValue(allTransactions)
+                Log.d("TransactionViewModel", "Total Transactions Loaded: ${allTransactions.size}")
+            }
         }
     }
 }
+
+// ✅ Convert IncomeModel & ExpenseModel to TransactionModel
+private fun com.example.cashiq.model.IncomeModel.toTransactionModel(type: String) =
+    TransactionModel(id, userId, category, amount, incomeDate, incomeNote, type)
+
+private fun com.example.cashiq.model.ExpenseModel.toTransactionModel(type: String) =
+    TransactionModel(id, userId, category, amount, expenseDate, expenseNote, type)

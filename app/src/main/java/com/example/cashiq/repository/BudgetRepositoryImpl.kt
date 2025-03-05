@@ -1,83 +1,74 @@
 package com.example.cashiq.repository
 
+import android.util.Log
 import com.example.cashiq.model.BudgetModel
 import com.google.firebase.database.*
 
 class BudgetRepositoryImpl : BudgetRepository {
 
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val ref: DatabaseReference = database.reference.child("budgets")
+    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("budgets")
 
+    // ✅ Add Budget to Firebase
     override fun addBudget(budget: BudgetModel, callback: (Boolean, String) -> Unit) {
-        val id = ref.push().key.toString()
-        val newBudget = budget.copy(budgetId = id)
+        val id = database.push().key ?: return
+        val budgetWithId = budget.copy(id = id)
 
-        ref.child(id).setValue(newBudget).addOnCompleteListener {
-            if (it.isSuccessful) {
-                callback(true, "Budget added successfully")
-            } else {
-                callback(false, it.exception?.message ?: "Error adding budget")
-            }
-        }
-    }
+        Log.d("BudgetRepository", "🔄 Adding Budget: $budgetWithId")
 
-    override fun updateBudget(budgetId: String, data: MutableMap<String, Any>, callback: (Boolean, String) -> Unit) {
-        ref.child(budgetId).updateChildren(data).addOnCompleteListener {
-            if (it.isSuccessful) {
-                callback(true, "Budget updated successfully")
-            } else {
-                callback(false, it.exception?.message ?: "Error updating budget")
-            }
-        }
-    }
-
-    override fun deleteBudget(budgetId: String, callback: (Boolean, String) -> Unit) {
-        ref.child(budgetId).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) {
-                callback(true, "Budget deleted successfully")
-            } else {
-                callback(false, it.exception?.message ?: "Error deleting budget")
-            }
-        }
-    }
-
-    override fun getBudgetById(budgetId: String, callback: (BudgetModel?, Boolean, String) -> Unit) {
-        ref.child(budgetId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val budget = snapshot.getValue(BudgetModel::class.java)
-                    callback(budget, true, "Budget fetched successfully")
+        database.child(id).setValue(budgetWithId)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("BudgetRepository", "✅ Budget Added Successfully")
+                    callback(true, "Budget added successfully.")
                 } else {
-                    callback(null, false, "Budget not found")
+                    Log.e("BudgetRepository", "❌ Budget Add Failed: ${task.exception?.message}")
+                    callback(false, task.exception?.message ?: "Unknown error")
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(null, false, error.message)
+            .addOnFailureListener { exception ->
+                Log.e("BudgetRepository", "❌ Firebase Write Error: ${exception.message}")
+                callback(false, exception.message ?: "Firebase error occurred.")
             }
-        })
     }
 
-    override fun getAllBudgets(callback: (List<BudgetModel>?, Boolean, String) -> Unit) {
-        ref.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
+    // ✅ Retrieve Budgets for a Specific User (Live Updates)
+    override fun getBudgets(userId: String, callback: (List<BudgetModel>?, Boolean, String) -> Unit) {
+        database.orderByChild("userId").equalTo(userId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
                     val budgets = mutableListOf<BudgetModel>()
-                    for (eachData in snapshot.children) {
-                        val budget = eachData.getValue(BudgetModel::class.java)
-                        if (budget != null) {
-                            budgets.add(budget)
-                        }
+                    for (data in snapshot.children) {
+                        val budget = data.getValue(BudgetModel::class.java)
+                        budget?.let { budgets.add(it) }
                     }
-                    callback(budgets, true, "Budgets fetched successfully")
+                    Log.d("BudgetRepository", "✅ Retrieved ${budgets.size} Budgets")
+                    callback(budgets, true, "Budgets retrieved successfully.")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("BudgetRepository", "❌ Firebase Read Error: ${error.message}")
+                    callback(null, false, error.message)
+                }
+            })
+    }
+
+    // ✅ Delete Budget by ID
+    override fun deleteBudget(budgetId: String, callback: (Boolean, String) -> Unit) {
+        Log.d("BudgetRepository", "🔄 Deleting Budget ID: $budgetId")
+
+        database.child(budgetId).removeValue()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("BudgetRepository", "✅ Budget Deleted Successfully")
+                    callback(true, "Budget deleted successfully.")
                 } else {
-                    callback(emptyList(), false, "No budgets found")
+                    Log.e("BudgetRepository", "❌ Budget Deletion Failed: ${task.exception?.message}")
+                    callback(false, task.exception?.message ?: "Unknown error")
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(null, false, error.message)
+            .addOnFailureListener { exception ->
+                Log.e("BudgetRepository", "❌ Firebase Delete Error: ${exception.message}")
+                callback(false, exception.message ?: "Firebase error occurred.")
             }
-        })
     }
 }

@@ -1,60 +1,111 @@
 package com.example.cashiq.UI.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cashiq.R
+import com.example.cashiq.adapter.TransactionAdapter
+import com.example.cashiq.viewmodel.TransactionViewModel
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [WeekFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class WeekFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val transactionViewModel: TransactionViewModel by viewModels()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_week, container, false)
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_week, container, false)
+
+        val recyclerView: RecyclerView = view.findViewById(R.id.week_recycler)
+        val loadingIndicator: ImageView = view.findViewById(R.id.loadingIndicator)
+        val noTransactionsText: TextView = view.findViewById(R.id.noTransactionsText)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // ✅ Show loading indicator while fetching data
+        loadingIndicator.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        noTransactionsText.visibility = View.GONE
+
+        loadWeekTransactions(loadingIndicator, recyclerView, noTransactionsText)
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment WeekFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            WeekFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    // ✅ Fetch Transactions for the Current Week
+    private fun loadWeekTransactions(
+        loadingIndicator: ImageView,
+        recyclerView: RecyclerView,
+        noTransactionsText: TextView
+    ) {
+        userId?.let {
+            transactionViewModel.getAllTransactions(it)
+
+            transactionViewModel.transactions.observe(viewLifecycleOwner, Observer { transactions ->
+                Log.d("WeekFragment", "Total Transactions Fetched: ${transactions.size}")
+
+                val (weekStart, weekEnd) = getCurrentWeekRange()
+                Log.d("WeekFragment", "Week Start: $weekStart, Week End: $weekEnd")
+
+                val weekTransactions = transactions.filter { transaction ->
+                    val transactionDateOnly = extractDate(transaction.date)
+                    Log.d("WeekFragment", "Transaction Date: $transactionDateOnly")
+                    transactionDateOnly in weekStart..weekEnd
                 }
-            }
+
+                if (weekTransactions.isNotEmpty()) {
+                    val adapter = TransactionAdapter(weekTransactions)
+                    recyclerView.adapter = adapter
+                    adapter.notifyDataSetChanged()
+
+                    // ✅ Hide Loading & Show Data
+                    loadingIndicator.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                    noTransactionsText.visibility = View.GONE
+                    Log.d("WeekFragment", "Transactions this week: ${weekTransactions.size}")
+                } else {
+                    // ✅ Show "No Transactions This Week" Message
+                    loadingIndicator.visibility = View.GONE
+                    recyclerView.visibility = View.GONE
+                    noTransactionsText.visibility = View.VISIBLE
+                    Log.d("WeekFragment", "No transactions found for this week.")
+                }
+            })
+        }
+    }
+
+    // ✅ Get Current Week Start & End Dates in "yyyy-MM-dd" format
+    private fun getCurrentWeekRange(): Pair<String, String> {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+
+        // Get the first day of the week (Monday)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val weekStart = sdf.format(calendar.time)
+
+        // Get the last day of the week (Sunday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val weekEnd = sdf.format(calendar.time)
+
+        return Pair(weekStart, weekEnd)
+    }
+
+    // ✅ Extract only "yyyy-MM-dd" from a full date-time string
+    private fun extractDate(fullDate: String): String {
+        return fullDate.substring(0, 10) // Extracts "yyyy-MM-dd" from "yyyy-MM-dd HH:mm:ss"
     }
 }
